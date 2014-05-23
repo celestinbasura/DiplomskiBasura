@@ -1,0 +1,62 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="5dp"
+    android:background="#FFFFFFFF"
+    tools:context="com.cele.diplomski.app.Splash">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.15"
+        android:text="Diplomski rad"
+        android:textSize="30sp"
+        android:textColor="#ff000000"
+        android:gravity="center"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.4"
+        android:layout_margin="10dp"
+        android:src="@drawable/tvz_logo"/>
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.15"
+        android:padding="5dp"
+        android:textColor="#ff000000"
+        android:text="Upravljanje postrojenjem pomocu Android aplikacije"
+        android:textSize="23sp"
+        android:gravity="center"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.08"
+        android:textColor="#ff000000"
+        android:text="Student: Celestin Basura"
+        android:textSize="15sp"
+        android:gravity="center"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.08"
+        android:textColor="#ff000000"
+        android:text="Mentor: mr. sc. Goran Malcic v. pred."
+        android:textSize="15sp"
+        android:gravity="center"/>
+
+
+
+
+</LinearLayout>

@@ -1,0 +1,87 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.cele.diplomskibasura.app.SentronActivity">
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal"
+       android:padding="10dp"
+       android:background="#ff9398d2"
+       >
+       <TextView
+           android:layout_width="0dp"
+           android:layout_height="match_parent"
+           android:layout_weight="0.3"
+           android:text="L1    "
+           android:textSize="75sp"/>
+
+       <TextView
+           android:layout_width="0dp"
+           android:layout_height="match_parent"
+           android:id="@+id/txt_sentron_l1"
+           android:layout_weight="0.4"
+           android:text="230V"
+           android:textSize="75dp"/>
+
+
+       </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#ff9398d2"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:text="L2    "
+            android:textSize="75sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/txt_sentron_l2"
+            android:layout_weight="0.4"
+            android:text="230V"
+            android:textSize="75dp"/>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#ff9398d2"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:text="L3    "
+            android:textSize="75sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/txt_sentron_l3"
+            android:layout_weight="0.4"
+            android:text="230V"
+            android:textSize="75dp"/>
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
