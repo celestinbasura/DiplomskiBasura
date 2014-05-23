@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -25,7 +27,7 @@ public class Postavke extends Activity {
     EditText sentronPort;
 
 
-    private static final String PREF_NAME = "Adrese";
+
 
     // User name (make variable public to access from outside)
     public static final String ACS_IP = "acsIP";
@@ -43,7 +45,7 @@ public class Postavke extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postavke);
 
-        final SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        final SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.MY_PREFS, 0); // 0 - for private mode
 
 
         acsIp = (EditText) findViewById(R.id.edt_acs880_ip);

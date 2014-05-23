@@ -1,10 +1,17 @@
 package com.cele.diplomskibasura.app;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.ghgande.j2mod.modbus.net.TCPConnectionHandler;
+import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 
 public class SentronActivity extends Activity {
@@ -13,6 +20,7 @@ public class SentronActivity extends Activity {
     TextView valueL1;
     TextView valueL2;
     TextView valueL3;
+    SharedPreferences sharedPreferences = getSharedPreferences(Constants.MY_PREFS, 0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,4 +54,28 @@ public class SentronActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    private void connectToDevice(){
+
+        String sentronIP = sharedPreferences.getString(Postavke.SENTRON_IP, Constants.DEFUALT_PAC_IP);
+        int sentronPort = sharedPreferences.getInt(Postavke.SENTRON_PORT, Constants.DEFUALT_PAC_PORT);
+
+
+        try {
+            InetAddress address = InetAddress.getByName(sentronIP);
+            TCPMasterConnection conn = new TCPMasterConnection(address);
+            conn.setPort(sentronPort);
+
+
+        } catch (UnknownHostException e) {
+
+
+
+        }
+
+
+    }
+
+
 }
