@@ -28,7 +28,6 @@ public class Postavke extends Activity {
 
 
 
-
     // User name (make variable public to access from outside)
     public static final String ACS_IP = "acsIP";
 
@@ -44,6 +43,7 @@ public class Postavke extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_postavke);
+
 
         final SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.MY_PREFS, 0); // 0 - for private mode
 
@@ -99,4 +99,5 @@ public class Postavke extends Activity {
 
 
     }
+
 }
