@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ghgande.j2mod.modbus.ModbusException;
+import com.ghgande.j2mod.modbus.ModbusIOException;
+import com.ghgande.j2mod.modbus.ModbusSlaveException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.ReadInputDiscretesRequest;
 import com.ghgande.j2mod.modbus.msg.ReadInputDiscretesResponse;
@@ -23,10 +25,12 @@ import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
 import com.ghgande.j2mod.modbus.net.TCPConnectionHandler;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
+import com.ghgande.j2mod.modbus.util.ModbusUtil;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class SentronActivity extends Activity {
@@ -40,19 +44,21 @@ public class SentronActivity extends Activity {
     SharedPreferences sharedPreferences;
     TCPMasterConnection conn;
     Timer tm;
+    TimerTask readRegs;
 
+    Handler handler = new Handler();
     ModbusTCPTransaction trans = null; //the transaction
     ReadMultipleRegistersRequest regRequest= null;
     ReadMultipleRegistersResponse regResponse = null;
 
-    
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sentron);
-       sharedPreferences = getApplicationContext().getSharedPreferences(Constants.MY_PREFS, 0); // 0 - for private mode
+        sharedPreferences = getApplicationContext().getSharedPreferences(Constants.MY_PREFS, 0); // 0 - for private mode
 
 
 
@@ -83,10 +89,25 @@ public class SentronActivity extends Activity {
 
     }
 
+@Override
+protected void onResume(){
+        super.onResume();
+    new Thread(new Runnable() {
+        @Override
+        public void run() {
+
+            connectToDevice();
+
+        }
+    }).start();
+
+
+}
+
 
 @Override
         protected void onPause(){
-
+    Log.d("cele", "Pause disconnect.");
         closeConnection();
    super.onPause();
 }
@@ -94,6 +115,7 @@ public class SentronActivity extends Activity {
 
     @Override
             protected void onStop(){
+        Log.d("cele", "Stop disconnect.");
         closeConnection();
         super.onStop();
 
@@ -110,12 +132,28 @@ public class SentronActivity extends Activity {
                 conn = new TCPMasterConnection(address);
                 conn.setPort(sentronPort);
                // conn.setTimeout(1000);
-                Log.d("cele", "Connecting...");
-                conn.connect();
+
+                if(!conn.isConnected()){
+                    Log.d("cele", "Connecting...");
+                    conn.connect();
+
+                }else{
+                    Log.d("cele", "Already connected");
+                }
+
 
                 if(conn.isConnected()){
                     Log.d("cele", "Connected");
-                    readSentronRegisters();
+
+                    tm = new Timer();
+                    readRegs = new TimerTask() {
+                        @Override
+                        public void run() {
+                            readSentronRegisters();
+                        }
+                    };
+
+                    tm.scheduleAtFixedRate( readRegs,  (long)100, (long)1000);
 
 
 
@@ -126,9 +164,11 @@ public class SentronActivity extends Activity {
                 Log.d("cele", "No host");
                 Log.d("cele", e.getMessage());
 
-                 } catch (Exception e) {
+                 }
+            catch (Exception e) {
+                e.printStackTrace();
                 Log.d("cele", "failed to Connect");
-                    Log.d("cele", " " + e.getMessage());
+                    Log.d("cele", " l" + e.getLocalizedMessage());
                 }
 
 
@@ -139,8 +179,11 @@ public class SentronActivity extends Activity {
         @Override
         public void run() {
 
+            //tm.purge();
 
-            if(conn.isConnected()){
+            if(conn != null && conn.isConnected() ){
+                tm.cancel();
+                readRegs.cancel();
                 conn.close();
                 Log.d("cele", "Connection closed to " + conn.getAddress());
 
@@ -158,30 +201,74 @@ public class SentronActivity extends Activity {
     }
 
 
-    void readSentronRegisters(){
 
 
+    void readSentronRegisters() {
 
-        regRequest = new ReadMultipleRegistersRequest(49, 1);
+
+        regRequest = new ReadMultipleRegistersRequest(49, 3);
 
         trans = new ModbusTCPTransaction(conn);
         trans.setRequest(regRequest);
 
         try {
             trans.execute();
+        }
+
+        catch (ModbusIOException e) {
+            Log.d("cele", "IO error");
+
+            e.printStackTrace();
+        } catch (ModbusSlaveException e) {
+
+            Log.d("cele", "Slave returned exception");
+            e.printStackTrace();
         } catch (ModbusException e) {
+            Log.d("cele", "Failed to execute request");
+
             e.printStackTrace();
         }
+
+
         regResponse = (ReadMultipleRegistersResponse) trans.getResponse();
-        for(int i = 0; i < regResponse.getWordCount(); i++){
+        for (int i = 0; i < regResponse.getWordCount(); i++) {
 
             Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
         }
 
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+
+                refreshGUI();
+            }
+        });
 
     }
 
-    }
+    void refreshGUI(){
+
+
+                if(regResponse!= null){
+                    
+                    valueL1.setText(regResponse.getRegisterValue(0) + " V");
+                    valueL2.setText(regResponse.getRegisterValue(1) + " V");
+                    valueL3.setText(regResponse.getRegisterValue(2) + " V");
+
+                }else{
+
+                    Log.d("cele", "reg emtpy");
+                }
+
+            }
+
+
+        }
+
+
+
+
+
 
 
 
