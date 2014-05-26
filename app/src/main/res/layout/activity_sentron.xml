@@ -1,9 +1,16 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+
     tools:context="com.cele.diplomskibasura.app.SentronActivity">
+
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
 
    <LinearLayout
        android:layout_width="match_parent"
@@ -17,7 +24,7 @@
            android:layout_height="match_parent"
            android:layout_weight="0.3"
            android:text="L1    "
-           android:textSize="75sp"/>
+           android:textSize="40sp"/>
 
        <TextView
            android:layout_width="0dp"
@@ -25,7 +32,7 @@
            android:id="@+id/txt_sentron_l1"
            android:layout_weight="0.4"
            android:text="-"
-           android:textSize="75dp"/>
+           android:textSize="40dp"/>
 
 
        </LinearLayout>
@@ -43,7 +50,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.3"
             android:text="L2    "
-            android:textSize="75sp"/>
+            android:textSize="40sp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -51,7 +58,7 @@
             android:id="@+id/txt_sentron_l2"
             android:layout_weight="0.4"
             android:text="-"
-            android:textSize="75dp"/>
+            android:textSize="40dp"/>
 
 
     </LinearLayout>
@@ -69,7 +76,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.3"
             android:text="L3    "
-            android:textSize="75sp"/>
+            android:textSize="40sp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -77,11 +84,84 @@
             android:id="@+id/txt_sentron_l3"
             android:layout_weight="0.4"
             android:text="-"
-            android:textSize="75dp"/>
+            android:textSize="40dp"/>
 
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#ff9398d2"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:text="I1    "
+            android:textSize="40sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/txt_sentron_i1"
+            android:layout_weight="0.4"
+            android:text="-"
+            android:textSize="40dp"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#ff9398d2"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:text="I2    "
+            android:textSize="40sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/txt_sentron_i2"
+            android:layout_weight="0.4"
+            android:text="-"
+            android:textSize="40dp"/>
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#ff9398d2"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:text="I3    "
+            android:textSize="40sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/txt_sentron_i3"
+            android:layout_weight="0.4"
+            android:text="-"
+            android:textSize="40dp"/>
+
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -96,7 +176,7 @@
             android:layout_height="match_parent"
             android:layout_weight="0.3"
             android:text="freq    "
-            android:textSize="75sp"/>
+            android:textSize="40sp"/>
 
         <TextView
             android:layout_width="0dp"
@@ -104,11 +184,39 @@
             android:id="@+id/txt_sentron_freq"
             android:layout_weight="0.4"
             android:text="-"
-            android:textSize="75dp"/>
+            android:textSize="40dp"/>
 
 
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:background="#ff9398d2"
+        >
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.3"
+            android:text="Vph-n    "
+            android:textSize="40sp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/txt_sentron_avg_v_n"
+            android:layout_weight="0.4"
+            android:text="-"
+            android:textSize="40dp"/>
 
 
+    </LinearLayout>
+<Button
+    android:layout_width="match_parent"
+    android:layout_height="90dp"
+    android:id="@+id/btn_test"/>
+    </LinearLayout>
 
-</LinearLayout>
+
+</ScrollView>

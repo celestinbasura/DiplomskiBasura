@@ -23,12 +23,19 @@ import com.ghgande.j2mod.modbus.msg.ReadInputRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadInputRegistersResponse;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
+import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
+import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersResponse;
+import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterRequest;
+import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterResponse;
 import com.ghgande.j2mod.modbus.net.TCPConnectionHandler;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
+import com.ghgande.j2mod.modbus.procimg.Register;
+import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 import com.ghgande.j2mod.modbus.util.ModbusUtil;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,7 +46,13 @@ public class SentronActivity extends Activity {
     TextView valueL1;
     TextView valueL2;
     TextView valueL3;
-    Button btnConnect;
+    TextView frequency;
+    TextView valueI1;
+    TextView valueI2;
+    TextView valueI3;
+    TextView avgVoltage;
+
+    Button test;
     Boolean isConnectedToSlave = false;
     SharedPreferences sharedPreferences;
     TCPMasterConnection conn;
@@ -47,9 +60,9 @@ public class SentronActivity extends Activity {
     TimerTask readRegs;
 
     Handler handler = new Handler();
-    ModbusTCPTransaction trans = null; //the transaction
+    volatile ModbusTCPTransaction trans = null; //the transaction
     ReadMultipleRegistersRequest regRequest= null;
-    ReadMultipleRegistersResponse regResponse = null;
+    volatile ReadMultipleRegistersResponse regResponse = null;
 
 
 
@@ -65,25 +78,20 @@ public class SentronActivity extends Activity {
         valueL1 = (TextView) findViewById(R.id.txt_sentron_l1);
         valueL2 = (TextView) findViewById(R.id.txt_sentron_l2);
         valueL3 = (TextView) findViewById(R.id.txt_sentron_l3);
-        btnConnect = (Button) findViewById(R.id.btn_sentron_connect);
+        frequency = (TextView) findViewById(R.id.txt_sentron_freq);
+        valueI1 = (TextView) findViewById(R.id.txt_sentron_i1);
+        valueI2 = (TextView) findViewById(R.id.txt_sentron_i2);
+        valueI3 = (TextView) findViewById(R.id.txt_sentron_i3);
+        avgVoltage = (TextView) findViewById(R.id.txt_sentron_avg_v_n);
+        test = (Button) findViewById(R.id.btn_test);
 
-        btnConnect.setOnClickListener(new View.OnClickListener() {
+        test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(getApplicationContext(), "cliked", Toast.LENGTH_SHORT).show();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        connectToDevice();
-                    }
-                }).start();
-
+                writeToSentronTest();
 
             }
-
-
         });
 
 
@@ -153,7 +161,7 @@ protected void onResume(){
                         }
                     };
 
-                    tm.scheduleAtFixedRate( readRegs,  (long)100, (long)1000);
+                    tm.scheduleAtFixedRate( readRegs,  (long)100, (long)500);
 
 
 
@@ -201,18 +209,46 @@ protected void onResume(){
     }
 
 
+ void writeToSentronTest(){
 
+     SimpleRegister[] sr = new SimpleRegister[1];
+     sr[0] = new SimpleRegister((int)(Math.random() * 1000));
+     Log.d("cele", "reg created");
+
+     WriteMultipleRegistersRequest singleRequest = new WriteMultipleRegistersRequest(69, sr);
+    // WriteMultipleRegisterRequest singleRequest = new WriteSingleRegisterRequest(8, sr);
+    // WriteMultipleRegisterResponse singleResponse = null;
+     WriteMultipleRegistersResponse singleResponse = null;
+
+
+      //WriteMultipleRegistersRequest writeRequest = new WriteMultipleRegistersRequest(sr);
+     Log.d("cele", "request set");
+    trans.setRequest(singleRequest);
+     try {
+
+         trans.execute();
+         trans.getResponse();
+         Log.d("cele", "executed");
+     } catch (ModbusException e) {
+         e.printStackTrace();
+     }
+
+
+ }
 
     void readSentronRegisters() {
 
 
-        regRequest = new ReadMultipleRegistersRequest(49, 3);
+
+        regRequest = new ReadMultipleRegistersRequest(1, 75);
 
         trans = new ModbusTCPTransaction(conn);
         trans.setRequest(regRequest);
 
         try {
+
             trans.execute();
+
         }
 
         catch (ModbusIOException e) {
@@ -229,12 +265,22 @@ protected void onResume(){
             e.printStackTrace();
         }
 
+        try{
 
-        regResponse = (ReadMultipleRegistersResponse) trans.getResponse();
-        for (int i = 0; i < regResponse.getWordCount(); i++) {
+                regResponse = (ReadMultipleRegistersResponse) trans.getResponse();
 
-            Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
+        }catch (ClassCastException e){
+            trans.setRequest(regRequest);
+            e.printStackTrace();
         }
+
+
+   //     for (int i = 0; i < regResponse.getWordCount(); i++) {
+//
+  //          Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
+    //    }
+
+
 
         handler.post(new Runnable() {
             @Override
@@ -250,10 +296,35 @@ protected void onResume(){
 
 
                 if(regResponse!= null){
-                    
-                    valueL1.setText(regResponse.getRegisterValue(0) + " V");
-                    valueL2.setText(regResponse.getRegisterValue(1) + " V");
-                    valueL3.setText(regResponse.getRegisterValue(2) + " V");
+
+                    Log.d("cele", "Values refreshed");
+                    valueL1.setText(( String.format("%.3f V",
+                            twoIntsToFloat( regResponse.getRegisterValue(0), regResponse.getRegisterValue(1)))));
+
+
+                    valueL2.setText(( String.format("%.3f V",
+                            twoIntsToFloat( regResponse.getRegisterValue(2), regResponse.getRegisterValue(3)))));
+
+                    valueL3.setText(( String.format("%.3f V",
+                            twoIntsToFloat( regResponse.getRegisterValue(4), regResponse.getRegisterValue(5)))));
+
+                    frequency.setText((String.format("%d Hz", regResponse.getRegisterValue(68))));
+
+                           // twoIntsToFloat(regResponse.getRegisterValue(54), regResponse.getRegisterValue(55)))));
+
+
+                    valueI1.setText(( String.format("%.3f A",
+                            twoIntsToFloat( regResponse.getRegisterValue(12), regResponse.getRegisterValue(13)))));
+
+
+                    valueI2.setText(( String.format("%.3f A",
+                            twoIntsToFloat( regResponse.getRegisterValue(14), regResponse.getRegisterValue(15)))));
+
+                    valueI3.setText(( String.format("%.3f A",
+                            twoIntsToFloat( regResponse.getRegisterValue(16), regResponse.getRegisterValue(17)))));
+
+                    avgVoltage.setText(( String.format("%.3f V",
+                            twoIntsToFloat( regResponse.getRegisterValue(56), regResponse.getRegisterValue(57)))));
 
                 }else{
 
@@ -261,6 +332,17 @@ protected void onResume(){
                 }
 
             }
+
+
+    public static float twoIntsToFloat(int reg1, int reg2) {
+
+        byte[] b1 = ByteBuffer.allocate(4).putInt(reg1).array();
+        byte[] b2 = ByteBuffer.allocate(4).putInt(reg2).array();
+
+        byte[] b32bit = {b1[2], b1[3], b2[2], b2[3]  };
+
+        return ByteBuffer.wrap(b32bit).getFloat();
+    }
 
 
         }
