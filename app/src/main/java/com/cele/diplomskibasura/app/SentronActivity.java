@@ -29,7 +29,6 @@ import com.ghgande.j2mod.modbus.util.ModbusUtil;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,7 +39,7 @@ public class SentronActivity extends Activity {
     TextView valueL1;
     TextView valueL2;
     TextView valueL3;
-
+    Button btnConnect;
     Boolean isConnectedToSlave = false;
     SharedPreferences sharedPreferences;
     TCPMasterConnection conn;
@@ -49,17 +48,11 @@ public class SentronActivity extends Activity {
 
     Handler handler = new Handler();
     ModbusTCPTransaction trans = null; //the transaction
-    ReadMultipleRegistersRequest regRequestL1= null;
-    ReadMultipleRegistersResponse regResponseL1 = null;
+    ReadMultipleRegistersRequest regRequest= null;
+    ReadMultipleRegistersResponse regResponse = null;
 
-    ReadMultipleRegistersRequest regRequestL2= null;
-    ReadMultipleRegistersResponse regResponseL2 = null;
 
-    ReadMultipleRegistersRequest regRequestL3 = null;
-    ReadMultipleRegistersResponse regResponseL3 = null;
 
-    ArrayList <ReadMultipleRegistersRequest> requests = new ArrayList<ReadMultipleRegistersRequest>();
-    ArrayList<ReadMultipleRegistersResponse> responses = new ArrayList<ReadMultipleRegistersResponse>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,11 +65,26 @@ public class SentronActivity extends Activity {
         valueL1 = (TextView) findViewById(R.id.txt_sentron_l1);
         valueL2 = (TextView) findViewById(R.id.txt_sentron_l2);
         valueL3 = (TextView) findViewById(R.id.txt_sentron_l3);
+        btnConnect = (Button) findViewById(R.id.btn_sentron_connect);
+
+        btnConnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Toast.makeText(getApplicationContext(), "cliked", Toast.LENGTH_SHORT).show();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        connectToDevice();
+                    }
+                }).start();
 
 
+            }
 
 
-
+        });
 
 
     }
@@ -197,52 +205,35 @@ protected void onResume(){
 
     void readSentronRegisters() {
 
-        responses.add(regResponseL1);
-        responses.add(regResponseL2);
 
-
-
-        requests.add(regRequestL1);
-        requests.add(regRequestL2);
-        requests.add(regRequestL3);
-        regRequestL1 = new ReadMultipleRegistersRequest(1, 2);
-        regRequestL2 = new ReadMultipleRegistersRequest(3, 2);
-        regRequestL3 = new ReadMultipleRegistersRequest(5, 2);
+        regRequest = new ReadMultipleRegistersRequest(49, 3);
 
         trans = new ModbusTCPTransaction(conn);
+        trans.setRequest(regRequest);
 
+        try {
+            trans.execute();
+        }
 
-        for(int i = 0; i < requests.size(); i++){
+        catch (ModbusIOException e) {
+            Log.d("cele", "IO error");
 
-            trans.setRequest(requests.get(i));
+            e.printStackTrace();
+        } catch (ModbusSlaveException e) {
 
-            try {
-                trans.execute();
-            } catch (ModbusIOException e) {
-                Log.d("cele", "IO error");
-                e.printStackTrace();
-            } catch (ModbusSlaveException e) {
-                Log.d("cele", "Slave returned exception");
-                e.printStackTrace();
-            } catch (ModbusException e) {
-                Log.d("cele", "Failed to execute request");
-                e.printStackTrace();
-            }
+            Log.d("cele", "Slave returned exception");
+            e.printStackTrace();
+        } catch (ModbusException e) {
+            Log.d("cele", "Failed to execute request");
 
-            regResponseL1 = (ReadMultipleRegistersResponse) trans.getResponse();
-
-
-
+            e.printStackTrace();
         }
 
 
+        regResponse = (ReadMultipleRegistersResponse) trans.getResponse();
+        for (int i = 0; i < regResponse.getWordCount(); i++) {
 
-
-
-
-        for (int i = 0; i < regResponseL1.getWordCount(); i++) {
-
-            Log.d("cele", "Value is " + i + " :  " + regResponseL1.getRegisterValue(i));
+            Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
         }
 
         handler.post(new Runnable() {
@@ -258,11 +249,11 @@ protected void onResume(){
     void refreshGUI(){
 
 
-                if(regResponseL1!= null){
-
-                    valueL1.setText(regResponseL1.getRegisterValue(0) + " V");
-                    valueL2.setText(regResponseL1.getRegisterValue(1) + " V");
-                    valueL3.setText(regResponseL1.getRegisterValue(2) + " V");
+                if(regResponse!= null){
+                    
+                    valueL1.setText(regResponse.getRegisterValue(0) + " V");
+                    valueL2.setText(regResponse.getRegisterValue(1) + " V");
+                    valueL3.setText(regResponse.getRegisterValue(2) + " V");
 
                 }else{
 
