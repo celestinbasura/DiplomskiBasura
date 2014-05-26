@@ -17,6 +17,7 @@ import com.ghgande.j2mod.modbus.ModbusException;
 import com.ghgande.j2mod.modbus.ModbusIOException;
 import com.ghgande.j2mod.modbus.ModbusSlaveException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
+import com.ghgande.j2mod.modbus.msg.ModbusResponse;
 import com.ghgande.j2mod.modbus.msg.ReadInputDiscretesRequest;
 import com.ghgande.j2mod.modbus.msg.ReadInputDiscretesResponse;
 import com.ghgande.j2mod.modbus.msg.ReadInputRegistersRequest;
@@ -64,6 +65,8 @@ public class SentronActivity extends Activity {
     ReadMultipleRegistersRequest regRequest= null;
     volatile ReadMultipleRegistersResponse regResponse = null;
 
+
+    Boolean isWriting = false;
 
 
 
@@ -209,36 +212,56 @@ protected void onResume(){
     }
 
 
- void writeToSentronTest(){
+ void writeToSentronTest() {
 
-     SimpleRegister[] sr = new SimpleRegister[1];
-     sr[0] = new SimpleRegister((int)(Math.random() * 1000));
-     Log.d("cele", "reg created");
-
-     WriteMultipleRegistersRequest singleRequest = new WriteMultipleRegistersRequest(69, sr);
-    // WriteMultipleRegisterRequest singleRequest = new WriteSingleRegisterRequest(8, sr);
-    // WriteMultipleRegisterResponse singleResponse = null;
-     WriteMultipleRegistersResponse singleResponse = null;
+     new Thread(new Runnable() {
+         @Override
+         public void run() {
 
 
-      //WriteMultipleRegistersRequest writeRequest = new WriteMultipleRegistersRequest(sr);
-     Log.d("cele", "request set");
-    trans.setRequest(singleRequest);
-     try {
+             SimpleRegister[] sr = new SimpleRegister[1];
+             sr[0] = new SimpleRegister((int) (Math.random() * 1000));
+             Log.d("cele", "reg created");
 
-         trans.execute();
-         trans.getResponse();
-         Log.d("cele", "executed");
-     } catch (ModbusException e) {
-         e.printStackTrace();
+             WriteMultipleRegistersRequest singleRequest = new WriteMultipleRegistersRequest(69, sr);
+             // WriteMultipleRegisterRequest singleRequest = new WriteSingleRegisterRequest(8, sr);
+             // WriteMultipleRegisterResponse singleResponse = null;
+             WriteMultipleRegistersResponse singleResponse = null;
+
+
+             //WriteMultipleRegistersRequest writeRequest = new WriteMultipleRegistersRequest(sr);
+             Log.d("cele", "request set");
+             trans.setRequest(singleRequest);
+             try {
+
+                 trans.execute();
+                 trans.getResponse();
+                 Log.d("cele", "executed");
+             } catch (ModbusException e) {
+                 e.printStackTrace();
+             } catch (NullPointerException e){
+
+                 e.printStackTrace();
+             }
+             isWriting = false;
+                readSentronRegisters();
+
+         }
+
+
      }
+     ).start();
 
+
+     isWriting = true;
 
  }
 
     void readSentronRegisters() {
 
-
+        if(isWriting){
+            return;
+        }
 
         regRequest = new ReadMultipleRegistersRequest(1, 75);
 
@@ -263,13 +286,19 @@ protected void onResume(){
             Log.d("cele", "Failed to execute request");
 
             e.printStackTrace();
+        }catch (NullPointerException e){
+
+            e.printStackTrace();
         }
 
-        try{
+        try {
+        if(trans.getResponse() instanceof WriteMultipleRegistersResponse){
 
+            Log.d("cele", " response is write");
+        }
                 regResponse = (ReadMultipleRegistersResponse) trans.getResponse();
 
-        }catch (ClassCastException e){
+        } catch (ClassCastException e){
             trans.setRequest(regRequest);
             e.printStackTrace();
         }
@@ -299,32 +328,46 @@ protected void onResume(){
 
                     Log.d("cele", "Values refreshed");
                     valueL1.setText(( String.format("%.3f V",
-                            twoIntsToFloat( regResponse.getRegisterValue(0), regResponse.getRegisterValue(1)))));
+                            twoIntsToFloat(
+                                    regResponse.getRegisterValue(0),
+                                    regResponse.getRegisterValue(1)))));
 
 
                     valueL2.setText(( String.format("%.3f V",
-                            twoIntsToFloat( regResponse.getRegisterValue(2), regResponse.getRegisterValue(3)))));
+                            twoIntsToFloat(
+                                    regResponse.getRegisterValue(2),
+                                    regResponse.getRegisterValue(3)))));
 
                     valueL3.setText(( String.format("%.3f V",
-                            twoIntsToFloat( regResponse.getRegisterValue(4), regResponse.getRegisterValue(5)))));
+                            twoIntsToFloat(
+                                    regResponse.getRegisterValue(4),
+                                    regResponse.getRegisterValue(5)))));
 
-                    frequency.setText((String.format("%d Hz", regResponse.getRegisterValue(68))));
+                    frequency.setText((String.format("%d Hz",
+                            regResponse.getRegisterValue(68))));
 
                            // twoIntsToFloat(regResponse.getRegisterValue(54), regResponse.getRegisterValue(55)))));
 
 
                     valueI1.setText(( String.format("%.3f A",
-                            twoIntsToFloat( regResponse.getRegisterValue(12), regResponse.getRegisterValue(13)))));
-
+                            twoIntsToFloat(
+                                    regResponse.getRegisterValue(12),
+                                    regResponse.getRegisterValue(13)))));
 
                     valueI2.setText(( String.format("%.3f A",
-                            twoIntsToFloat( regResponse.getRegisterValue(14), regResponse.getRegisterValue(15)))));
+                            twoIntsToFloat(
+                                    regResponse.getRegisterValue(14),
+                                    regResponse.getRegisterValue(15)))));
 
                     valueI3.setText(( String.format("%.3f A",
-                            twoIntsToFloat( regResponse.getRegisterValue(16), regResponse.getRegisterValue(17)))));
+                            twoIntsToFloat(
+                                    regResponse.getRegisterValue(16),
+                                    regResponse.getRegisterValue(17)))));
 
                     avgVoltage.setText(( String.format("%.3f V",
-                            twoIntsToFloat( regResponse.getRegisterValue(56), regResponse.getRegisterValue(57)))));
+                            twoIntsToFloat(
+                                    regResponse.getRegisterValue(56),
+                                    regResponse.getRegisterValue(57)))));
 
                 }else{
 
@@ -339,7 +382,7 @@ protected void onResume(){
         byte[] b1 = ByteBuffer.allocate(4).putInt(reg1).array();
         byte[] b2 = ByteBuffer.allocate(4).putInt(reg2).array();
 
-        byte[] b32bit = {b1[2], b1[3], b2[2], b2[3]  };
+        byte[] b32bit = { b1[2], b1[3], b2[2], b2[3] };
 
         return ByteBuffer.wrap(b32bit).getFloat();
     }
