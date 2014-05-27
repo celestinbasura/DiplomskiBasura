@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,9 +72,6 @@ public class SentronActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sentron);
         sharedPreferences = getApplicationContext().getSharedPreferences(Constants.MY_PREFS, 0); // 0 - for private mode
@@ -224,10 +220,10 @@ protected void onResume(){
 
 
              SimpleRegister[] sr = new SimpleRegister[1];
-             sr[0] = new SimpleRegister(1);
+             sr[0] = new SimpleRegister((int) (Math.random() * 1000));
              Log.d("cele", "reg created");
 
-             WriteSingleRegisterRequest singleRequest = new WRegistersRequest(1, sr);
+             WriteMultipleRegistersRequest singleRequest = new WriteMultipleRegistersRequest(69, sr);
              // WriteMultipleRegisterRequest singleRequest = new WriteSingleRegisterRequest(8, sr);
              // WriteMultipleRegisterResponse singleResponse = null;
              WriteMultipleRegistersResponse singleResponse = null;
@@ -308,10 +304,10 @@ protected void onResume(){
         }
 
 
-       for (int i = 0; i < 5; i++) {
-
-            Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
-        }
+   //     for (int i = 0; i < regResponse.getWordCount(); i++) {
+//
+  //          Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
+    //    }
 
 
 
