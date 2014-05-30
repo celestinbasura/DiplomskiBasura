@@ -19,8 +19,12 @@ import com.ghgande.j2mod.modbus.ModbusSlaveException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
+import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersResponse;
+import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterRequest;
+import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterResponse;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
+import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -155,14 +159,6 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     }
 
 
-    void writeToACS(int value, int address){
-
-
-
-
-
-
-    }
 
 
     void connectToDevice() {
@@ -268,7 +264,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         }
 
         try {
-            if (trans.getResponse() instanceof WriteMultipleRegistersResponse) {
+            if (trans.getResponse() instanceof WriteSingleRegisterResponse) {
 
                 Log.d("cele", " response is write");
             }
@@ -296,6 +292,57 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
     }
 
+
+    void writeToACS(final int value, final int register) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                SimpleRegister sr;
+                sr = new SimpleRegister(value);
+                Log.d("cele", "reg created");
+
+                WriteSingleRegisterRequest singleRequest = new WriteSingleRegisterRequest(register, sr);
+
+                Log.d("cele", "request set");
+                if (!(conn != null && conn.isConnected())) {
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            Toast.makeText(getBaseContext(), "Not connected to server", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    return;
+
+                }
+                trans.setRequest(singleRequest);
+                try {
+
+                    trans.execute();
+                    trans.getResponse();
+                    Log.d("cele", "executed");
+                } catch (ModbusException e) {
+                    e.printStackTrace();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+                isWriting = false;
+                readACSRegisters();
+                }
+
+
+        }
+        ).start();
+
+         isWriting = true;
+
+    }
+
+
     void refreshGUI() {
 
 
@@ -303,7 +350,9 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
             Log.d("cele", "Values refreshed");
 
-            //TODO: Gui refreshing
+            // TODO: Gui refreshing,
+            // TODO: getting bits for READY and start/stop,
+            // TODO: getting values to write to ACS
 
 
         } else {
