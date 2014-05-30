@@ -35,7 +35,7 @@ public class Splash extends Activity {
                 // close this activity
                 finish();
             }
-        }, 1* 1000); // wait for 3 seconds
+        }, 3* 1000); // wait for 3 seconds
 
     }
 

@@ -17,7 +17,7 @@
        android:layout_height="wrap_content"
        android:orientation="horizontal"
        android:padding="10dp"
-       android:background="#ff9398d2"
+       android:background="#ffcff1ff"
        >
        <TextView
            android:layout_width="0dp"
@@ -31,6 +31,7 @@
            android:layout_height="match_parent"
            android:id="@+id/txt_sentron_l1"
            android:layout_weight="0.4"
+           android:textStyle="bold"
            android:text="-"
            android:textSize="40dp"/>
 
@@ -43,7 +44,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:background="#ff9398d2"
+        android:background="#ffcff1ff"
         >
         <TextView
             android:layout_width="0dp"
@@ -56,6 +57,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:id="@+id/txt_sentron_l2"
+            android:textStyle="bold"
             android:layout_weight="0.4"
             android:text="-"
             android:textSize="40dp"/>
@@ -69,7 +71,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:background="#ff9398d2"
+        android:background="#ffcff1ff"
         >
         <TextView
             android:layout_width="0dp"
@@ -83,6 +85,7 @@
             android:layout_height="match_parent"
             android:id="@+id/txt_sentron_l3"
             android:layout_weight="0.4"
+            android:textStyle="bold"
             android:text="-"
             android:textSize="40dp"/>
 
@@ -94,7 +97,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:background="#ff9398d2"
+        android:background="#ffcff1ff"
         >
         <TextView
             android:layout_width="0dp"
@@ -108,6 +111,7 @@
             android:layout_height="match_parent"
             android:id="@+id/txt_sentron_i1"
             android:layout_weight="0.4"
+            android:textStyle="bold"
             android:text="-"
             android:textSize="40dp"/>
 
@@ -119,7 +123,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:background="#ff9398d2"
+        android:background="#ffcff1ff"
         >
         <TextView
             android:layout_width="0dp"
@@ -133,6 +137,7 @@
             android:layout_height="match_parent"
             android:id="@+id/txt_sentron_i2"
             android:layout_weight="0.4"
+            android:textStyle="bold"
             android:text="-"
             android:textSize="40dp"/>
 
@@ -143,7 +148,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:background="#ff9398d2"
+        android:background="#ffcff1ff"
         >
         <TextView
             android:layout_width="0dp"
@@ -157,6 +162,7 @@
             android:layout_height="match_parent"
             android:id="@+id/txt_sentron_i3"
             android:layout_weight="0.4"
+            android:textStyle="bold"
             android:text="-"
             android:textSize="40dp"/>
 
@@ -168,7 +174,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:background="#ff9398d2"
+        android:background="#ffcff1ff"
         >
 
         <TextView
@@ -183,6 +189,7 @@
             android:layout_height="match_parent"
             android:id="@+id/txt_sentron_freq"
             android:layout_weight="0.4"
+            android:textStyle="bold"
             android:text="-"
             android:textSize="40dp"/>
 
@@ -193,7 +200,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="10dp"
-        android:background="#ff9398d2"
+        android:background="#ffcff1ff"
         >
         <TextView
             android:layout_width="0dp"
@@ -207,15 +214,13 @@
             android:layout_height="match_parent"
             android:id="@+id/txt_sentron_avg_v_n"
             android:layout_weight="0.4"
+            android:textStyle="bold"
             android:text="-"
             android:textSize="40dp"/>
 
 
     </LinearLayout>
-<Button
-    android:layout_width="match_parent"
-    android:layout_height="90dp"
-    android:id="@+id/btn_test"/>
+
     </LinearLayout>
 
 
