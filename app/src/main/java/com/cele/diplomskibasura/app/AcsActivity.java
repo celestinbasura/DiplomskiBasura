@@ -1,6 +1,8 @@
 package com.cele.diplomskibasura.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,7 +34,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeListener{
+public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
 
 
     Button reverse;
@@ -77,31 +79,99 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
         speedReference = (SeekBar) findViewById(R.id.seek_acs_speed_reference);
 
-        startStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        speedReference.setOnSeekBarChangeListener(this);
+        speedReference.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                                      @Override
+                                                      public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
 
 
-                speedReference.setProgress(1000);
-                if(isReady){
+                                                          //Log.d("cele", "started progressracking");
+                                                      }
 
-                    if(isMotorRunning){
+                                                      @Override
+                                                      public void onStartTrackingTouch(SeekBar seekBar) {
 
-                        writeToACS(5, 5);
+                                                          Log.d("cele", "started starttracking");
+                                                      }
 
-                    }else{
+                                                      @Override
+                                                      public void onStopTrackingTouch(final SeekBar seekBar) {
 
-                        writeToACS(2, 5);
+
+
+                                                          Log.d("cele", "started stoptracking");
+                                                          final AlertDialog.Builder promjenaBrzine = new AlertDialog.Builder(AcsActivity.this);
+
+                                                          promjenaBrzine.setTitle("Promjena brzine");
+                                                          promjenaBrzine.setMessage("Da li ste sigurni da zelite motor staviti na " + seekBar.getProgress());
+
+                                                          promjenaBrzine.setPositiveButton("Da", new DialogInterface.OnClickListener() {
+                                                              @Override
+                                                              public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                                  Toast.makeText(getApplicationContext(), "Value is " + seekBar.getProgress(), Toast.LENGTH_SHORT).show();
+                                                                  writeToACS(5, seekBar.getProgress());//TODO: vrijednost za zaustavljanje motora
+
+                                                              }
+                                                          });
+
+                                                          promjenaBrzine.setNegativeButton("Odustani", new DialogInterface.OnClickListener() {
+                                                              @Override
+                                                              public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                              }
+                                                          });
+                                                            promjenaBrzine.show();
+
+                                                          //TODO: Write correct value as speed reference
+                                                      }
+                                                  });
+
+                startStop.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+
+                        speedReference.setProgress(1000);
+                        if (isReady) {
+
+                            if (isMotorRunning) {
+                                final AlertDialog.Builder stopMotor = new AlertDialog.Builder(AcsActivity.this);
+
+                                stopMotor.setTitle("Zaustavi motor");
+                                stopMotor.setMessage("Da li ste sigurni da zelite zaustaviti motor");
+
+                                stopMotor.setPositiveButton("Da", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+
+                                        writeToACS(5, 5);//TODO: vrijednost za zaustavljanje motora
+
+                                    }
+                                });
+
+                                stopMotor.setNegativeButton("Odustani", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                });
+
+
+                            } else {
+
+                                writeToACS(2, 5); //TODO: vrijednost za pokretanje motora
+                            }
+
+
+                        } else {
+
+                            Toast.makeText(getApplicationContext(), "Pretvarac nije spreman", Toast.LENGTH_SHORT);
+                        }
+
                     }
-
-
-                }else{
-
-                    Toast.makeText(getApplicationContext(), "Pretvarac nije spreman", Toast.LENGTH_SHORT);
-                }
-
-            }
-        });
+                });
 
     }
 
@@ -138,25 +208,6 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
     }
 
-
-
-
-
-
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-    }
-
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
-
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
-    }
 
 
 
@@ -363,4 +414,18 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     }
 
 
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
 }
