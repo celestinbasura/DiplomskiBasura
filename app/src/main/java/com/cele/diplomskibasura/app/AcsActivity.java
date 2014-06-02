@@ -398,7 +398,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
             Log.d("cele", "Values refreshed");
 
-            currentActualCurrent.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(54), regResponse.getRegisterValue(55)) + " A");
+            currentActualCurrent.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(54), regResponse.getRegisterValue(55), 100) + " A"); // Scales to current (ACS 880 = 100)
 
             currentActualSpeed.setText(regResponse.getRegisterValue(50) + regResponse.getRegisterValue(51) + regResponse.getRegisterValue(52) + "");
                    // regResponse.getRegisterValue(55) + "");
@@ -432,7 +432,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     }
 
 
-    public static int twoIntsToACSTransparent(int reg1, int reg2) {
+    public static int twoIntsToACSTransparent(int reg1, int reg2, int scaleValue) {
 
 
 
@@ -442,6 +442,6 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
         byte[] b32bit = {b1[2], b1[3], b2[2], b2[3]};
 
-        return ByteBuffer.wrap(b32bit).getInt();
+        return ByteBuffer.wrap(b32bit).getInt() / scaleValue;
     }
 }
