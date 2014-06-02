@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -21,8 +19,6 @@ import com.ghgande.j2mod.modbus.ModbusSlaveException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
-import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
-import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersResponse;
 import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterRequest;
 import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterResponse;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
@@ -30,6 +26,7 @@ import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -72,7 +69,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
         currentSpeedReference = (TextView) findViewById(R.id.txt_acs_reference_value);
         currentActualCurrent = (TextView) findViewById(R.id.txt_acs_current_current_value);
-        currentActualSpeed = (TextView) findViewById(R.id.txt_acs_speed_current_text);
+        currentActualSpeed = (TextView) findViewById(R.id.txt_acs_speed_current_value);
 
         startStop = (Button) findViewById(R.id.btn_acs_start_stop);
         reverse = (Button) findViewById(R.id.btn_acs_reverziranje);
@@ -288,7 +285,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             return;
         }
 
-        regRequest = new ReadMultipleRegistersRequest(0, 20);
+        regRequest = new ReadMultipleRegistersRequest(0, 75);
 
         trans = new ModbusTCPTransaction(conn);
         trans.setRequest(regRequest);
@@ -326,12 +323,12 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             e.printStackTrace();
         }
 
+                if(regResponse != null) {
+                    for (int i = 50; i < regResponse.getWordCount(); i++) {
 
-        //     for (int i = 0; i < regResponse.getWordCount(); i++) {
-//
-        //          Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
-        //    }
-
+                        Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
+                    }
+                }
 
         handler.post(new Runnable() {
             @Override
@@ -401,6 +398,11 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
             Log.d("cele", "Values refreshed");
 
+            currentActualCurrent.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(54), regResponse.getRegisterValue(55)) + " A");
+
+            currentActualSpeed.setText(regResponse.getRegisterValue(50) + regResponse.getRegisterValue(51) + regResponse.getRegisterValue(52) + "");
+                   // regResponse.getRegisterValue(55) + "");
+
             // TODO: Gui refreshing,
             // TODO: getting bits for READY and start/stop,
             // TODO: getting values to write to ACS
@@ -427,5 +429,19 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+
+    public static int twoIntsToACSTransparent(int reg1, int reg2) {
+
+
+
+
+        byte[] b1 = ByteBuffer.allocate(4).putInt(reg1).array();
+        byte[] b2 = ByteBuffer.allocate(4).putInt(reg2).array();
+
+        byte[] b32bit = {b1[2], b1[3], b2[2], b2[3]};
+
+        return ByteBuffer.wrap(b32bit).getInt();
     }
 }
