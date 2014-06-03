@@ -39,6 +39,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     TextView currentSpeedReference;
     TextView currentActualSpeed;
     TextView currentActualCurrent;
+    TextView currentActualPower;
     SeekBar speedReference;
 
 
@@ -70,6 +71,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         currentSpeedReference = (TextView) findViewById(R.id.txt_acs_reference_value);
         currentActualCurrent = (TextView) findViewById(R.id.txt_acs_current_current_value);
         currentActualSpeed = (TextView) findViewById(R.id.txt_acs_speed_current_value);
+        currentActualPower = (TextView) findViewById(R.id.txt_acs_current_power_value);
+        currentActualPower.setText("2,23 kW");
 
         startStop = (Button) findViewById(R.id.btn_acs_start_stop);
         reverse = (Button) findViewById(R.id.btn_acs_reverziranje);

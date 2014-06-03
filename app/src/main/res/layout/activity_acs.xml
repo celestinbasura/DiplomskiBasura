@@ -14,6 +14,8 @@
 <Button
     android:layout_width="match_parent"
     android:layout_height="70dp"
+    android:background="#ff2280d7"
+    android:textColor="#ffcff1ff"
     android:id="@+id/btn_acs_start_stop"
     android:text="Nije spremno"/>
 
@@ -64,6 +66,8 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:background="#ff2280d7"
+        android:textColor="#ffcff1ff"
         android:id="@+id/btn_acs_reverziranje"
         android:text="Promjena smjera"
         />
@@ -73,7 +77,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="45dp"
         android:orientation="horizontal"
         android:layout_marginTop="40dp">
 
@@ -96,8 +100,35 @@
     </LinearLayout>
 
     <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="45dp"
+    android:orientation="horizontal"
+    android:layout_marginTop="0dp">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7"
+        android:text="Trenutna struja:"
+        android:id="@+id/txt_acs_current_current_text"
+        android:textSize="20sp"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_weight="0.5"
+        android:layout_height="match_parent"
+        android:text="- A"
+        android:layout_below="@id/seek_acs_speed_reference"
+        android:id="@+id/txt_acs_current_current_value"
+        android:textSize="20sp"/>
+
+
+
+</LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="45dp"
         android:orientation="horizontal"
         android:layout_marginTop="0dp">
 
@@ -105,18 +136,17 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.7"
-            android:text="Trenutna struja:"
-            android:id="@+id/txt_acs_current_current_text"
+            android:text="Trenutna snaga:"
+            android:id="@+id/txt_acs_current_power_text"
             android:textSize="20sp"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_weight="0.5"
             android:layout_height="match_parent"
-            android:text="- A"
+            android:text="- kW"
             android:layout_below="@id/seek_acs_speed_reference"
-            android:id="@+id/txt_acs_current_current_value"
+            android:id="@+id/txt_acs_current_power_value"
             android:textSize="20sp"/>
     </LinearLayout>
-    
 </LinearLayout>

@@ -2,10 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingLeft="15dp"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="#ffcff1ff"
     android:orientation="vertical"
     tools:context="com.cele.diplomskibasura.app.Postavke">
 
@@ -18,14 +18,15 @@
         android:gravity="center"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="0.2"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="0dp"
         android:orientation="horizontal"
-
+        android:layout_weight="0.2"
         android:layout_marginTop="10sp">
 
 
@@ -87,12 +88,14 @@
         android:layout_marginTop="50dp"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center"
-        android:layout_height="wrap_content" />
+        android:layout_height="0dp"
+        android:layout_weight="0.2"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="0dp"
+        android:layout_weight="0.2"
         android:orientation="horizontal"
         android:layout_marginTop="10sp">
 
@@ -140,11 +143,20 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.3"
+
+        ></LinearLayout>
+
     <Button
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:id="@+id/btn_save_settings"
         android:text="Spremi"
-        android:textSize="25sp"
+        android:background="#ff2280d7"
+        android:textColor="#ffcff1ff"
+        android:textSize="30sp"
         android:layout_margin="20dp"/>
 </LinearLayout>

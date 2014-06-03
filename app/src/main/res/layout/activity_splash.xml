@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_margin="5dp"
     android:background="#FFFFFFFF"
     tools:context="com.cele.diplomski.app.Splash">
 
