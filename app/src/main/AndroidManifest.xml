@@ -22,7 +22,7 @@
         </activity>
         <activity
             android:name="com.cele.diplomskibasura.app.Postavke"
-            android:label="@string/title_activity_postavke" >
+            android:label="Postavke" >
         </activity>
         <activity
             android:name="com.cele.diplomskibasura.app.SentronActivity"

@@ -26,6 +26,13 @@ public class Postavke extends Activity {
     EditText sentronIP;
     EditText sentronPort;
 
+    EditText acsCntrIn;
+    EditText acsCntrOut;
+    EditText acsSpeedRefIn;
+    EditText acsSpeedRefOut;
+    EditText acsPowerIn;
+    EditText acsCurrentIn;
+
 
 
     // User name (make variable public to access from outside)
@@ -37,6 +44,18 @@ public class Postavke extends Activity {
     public static final String SENTRON_IP = "acsIP";
 
     public static final String SENTRON_PORT = "sentronPort";
+
+    public static final String ACS_CNTR_WORD_NAME = "acsControl";
+
+    public static final String ACS_STS_WORD_NAME = "acsStatus";
+
+    public static final String ACS_SPEED_REF_READ = "acsSpeedRefRead";
+
+    public static final String ACS_SPEED_REF_WRITE = "acsSpeedRefWrite";
+
+    public static final String ACS_POWER_READ = "acsPower";
+
+    public static final String ACS_CURRENT_READ = "acsCurrent";
 
 
     @Override
@@ -56,11 +75,28 @@ public class Postavke extends Activity {
 
         btnSave = (Button) findViewById(R.id.btn_save_settings);
 
+        acsCntrIn = (EditText) findViewById(R.id.edt_acs_contr_word_adr);
+        acsCntrOut = (EditText) findViewById(R.id.edt_acs_status_wrd_adr);
+        acsSpeedRefIn = (EditText) findViewById(R.id.edt_acs_speedref_read_adr);
+        acsSpeedRefOut = (EditText) findViewById(R.id.edt_acs_speedref_set_adr);
+        acsPowerIn = (EditText) findViewById(R.id.edt_acs_power_read_adr);
+        acsCurrentIn = (EditText) findViewById(R.id.edt_acs_current_read_adr);
+
         acsIp.setText(pref.getString(ACS_IP, Constants.DEFUALT_ACS_IP));
         acsPort.setText(pref.getInt(ACS_PORT, Constants.DEFUALT_ACS_PORT) + "");
 
         sentronIP.setText(pref.getString(SENTRON_IP, Constants.DEFUALT_PAC_IP));
         sentronPort.setText(pref.getInt(SENTRON_PORT, Constants.DEFUALT_PAC_PORT) + "");
+
+        acsCntrIn.setText(pref.getInt(ACS_CNTR_WORD_NAME, Constants.DEFUALT_ACS_CNTR_WRD_ADR) + "");
+        acsCntrOut.setText(pref.getInt(ACS_STS_WORD_NAME, Constants.DEFUALT_ACS_STS_WRD_ADR) + "");
+        acsSpeedRefIn.setText(pref.getInt(ACS_SPEED_REF_READ, Constants.DEFUALT_ACS_SPEED_REF_READ_ADR) + "");
+        acsSpeedRefOut.setText(pref.getInt(ACS_SPEED_REF_WRITE, Constants.DEFUALT_ACS_SPEED_REF_WRT_ADR) + "");
+        acsPowerIn.setText(pref.getInt(ACS_POWER_READ, Constants.DEFUALT_ACS_POWER_READ_ADR) + "");
+        acsCurrentIn.setText(pref.getInt(ACS_CURRENT_READ, Constants.DEFUALT_ACS_CURRENT_READ_ADR) + "");
+
+
+
 
 
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -75,6 +111,18 @@ public class Postavke extends Activity {
 
                 editor.putString(SENTRON_IP, sentronIP.getText().toString());
                 editor.putInt(SENTRON_PORT, Integer.valueOf(sentronPort.getText().toString()));
+
+                editor.putInt(ACS_CNTR_WORD_NAME, Integer.valueOf(acsCntrIn.getText().toString()));
+
+                editor.putInt(ACS_STS_WORD_NAME, Integer.valueOf(acsCntrOut.getText().toString()));
+
+                editor.putInt(ACS_SPEED_REF_READ, Integer.valueOf(acsSpeedRefIn.getText().toString()));
+
+                editor.putInt(ACS_SPEED_REF_WRITE, Integer.valueOf(acsSpeedRefOut.getText().toString()));
+
+                editor.putInt(ACS_POWER_READ, Integer.valueOf(acsPowerIn.getText().toString()));
+
+                editor.putInt(ACS_CURRENT_READ, Integer.valueOf(acsCurrentIn.getText().toString()));
 
                 editor.commit();
                 Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show();

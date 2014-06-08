@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -19,7 +20,7 @@ import com.ghgande.j2mod.modbus.ModbusSlaveException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
-import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterRequest;
+import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterResponse;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
@@ -59,7 +60,15 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     volatile ReadMultipleRegistersResponse regResponse = null;
 
 
-
+    int controlWordAdr;
+    int statusWordAdr;
+    int speedRefInAdr;
+    int speedRefOutAdr;
+    int powerInAdr;
+    int currentInAdr;
+    int readSpeedRef = 0;
+    int dataInOffset = 54;
+    int dataOutOffset = 4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,10 +81,18 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         currentActualCurrent = (TextView) findViewById(R.id.txt_acs_current_current_value);
         currentActualSpeed = (TextView) findViewById(R.id.txt_acs_speed_current_value);
         currentActualPower = (TextView) findViewById(R.id.txt_acs_current_power_value);
-        currentActualPower.setText("2,23 kW");
+        //currentActualPower.setText("2,23 kW");
 
         startStop = (Button) findViewById(R.id.btn_acs_start_stop);
+        startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
         reverse = (Button) findViewById(R.id.btn_acs_reverziranje);
+
+        controlWordAdr = sharedPreferences.getInt(Postavke.ACS_CNTR_WORD_NAME, Constants.DEFUALT_ACS_CNTR_WRD_ADR) + dataOutOffset;
+        statusWordAdr = sharedPreferences.getInt(Postavke.ACS_STS_WORD_NAME, Constants.DEFUALT_ACS_STS_WRD_ADR) + dataInOffset;
+        speedRefInAdr = sharedPreferences.getInt(Postavke.ACS_SPEED_REF_READ, Constants.DEFUALT_ACS_SPEED_REF_READ_ADR) + dataInOffset;
+        speedRefOutAdr = sharedPreferences.getInt(Postavke.ACS_SPEED_REF_WRITE, Constants.DEFUALT_ACS_SPEED_REF_WRT_ADR) + dataOutOffset;
+        powerInAdr = sharedPreferences.getInt(Postavke.ACS_POWER_READ, Constants.DEFUALT_ACS_POWER_READ_ADR) + dataInOffset;
+        currentInAdr = sharedPreferences.getInt(Postavke.ACS_CURRENT_READ, Constants.DEFUALT_ACS_CURRENT_READ_ADR) + dataInOffset;
 
         speedReference = (SeekBar) findViewById(R.id.seek_acs_speed_reference);
 
@@ -103,14 +120,14 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                                           final AlertDialog.Builder promjenaBrzine = new AlertDialog.Builder(AcsActivity.this);
 
                                                           promjenaBrzine.setTitle("Promjena brzine");
-                                                          promjenaBrzine.setMessage("Da li ste sigurni da zelite motor staviti na " + seekBar.getProgress());
+                                                          promjenaBrzine.setMessage("Da li ste sigurni da zelite brzinu postaviti na " + seekBar.getProgress() / 20 + "%");
 
                                                           promjenaBrzine.setPositiveButton("Da", new DialogInterface.OnClickListener() {
                                                               @Override
                                                               public void onClick(DialogInterface dialogInterface, int i) {
 
                                                                   Toast.makeText(getApplicationContext(), "Value is " + seekBar.getProgress(), Toast.LENGTH_SHORT).show();
-                                                                  writeToACS(5, seekBar.getProgress());//TODO: vrijednost za zaustavljanje motora
+                                                                  writeToACS(speedRefOutAdr, seekBar.getProgress());//TODO: vrijednost za zaustavljanje motora
 
                                                               }
                                                           });
@@ -131,12 +148,13 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     @Override
                     public void onClick(View view) {
 
+                        Log.d("cele", "start pressed");
 
-                        speedReference.setProgress(1000);
                         if (isReady) {
+                            final AlertDialog.Builder stopMotor = new AlertDialog.Builder(AcsActivity.this);
 
                             if (isMotorRunning) {
-                                final AlertDialog.Builder stopMotor = new AlertDialog.Builder(AcsActivity.this);
+
 
                                 stopMotor.setTitle("Zaustavi motor");
                                 stopMotor.setMessage("Da li ste sigurni da zelite zaustaviti motor");
@@ -145,8 +163,34 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
 
+                                        setExactBit(false, 3, controlWordAdr);
 
-                                        writeToACS(5, 5);//TODO: vrijednost za zaustavljanje motora
+                                     //  writeToACS(controlWordAdr, 5);//TODO: vrijednost za zaustavljanje motora
+
+                                    }
+                                });
+
+                                stopMotor.setNegativeButton("Odustani", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                });
+                                stopMotor.show();
+
+                            } else {
+
+
+                                stopMotor.setTitle("Pokreni motor");
+                                stopMotor.setMessage("Da li ste sigurni da zelite pokrenuti motor");
+
+                                stopMotor.setPositiveButton("Da", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        setExactBit(true, 3, controlWordAdr);
+
+                                        //  writeToACS(controlWordAdr, 5);//TODO: vrijednost za zaustavljanje motora
 
                                     }
                                 });
@@ -158,21 +202,63 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                     }
                                 });
 
-
-                            } else {
-
-                                writeToACS(2, 5); //TODO: vrijednost za pokretanje motora
+                                stopMotor.show();
+                                //setExactBit(true, 3, controlWordAdr);
+                               // writeToACS(2, 5); //TODO: vrijednost za pokretanje motora
                             }
 
 
                         } else {
 
-                            Toast.makeText(getApplicationContext(), "Pretvarac nije spreman", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(), "Pretvarac nije spreman", Toast.LENGTH_SHORT).show();
                         }
+
+
 
                     }
                 });
 
+
+
+
+
+        reverse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                Log.d("cele", "Rev pressed");
+
+                if(!isMotorRunning){
+                    Toast.makeText(getApplicationContext(), "Motor nije pokrenut", Toast.LENGTH_SHORT).show();
+                    return;
+                }else {
+                    final AlertDialog.Builder promjenaSmjera = new AlertDialog.Builder(AcsActivity.this);
+                    promjenaSmjera.setTitle("Reverziranje");
+                    promjenaSmjera.setMessage("Da li ste sigurni da zelite reverzirati smjer vrtnje?");
+
+                    promjenaSmjera.setPositiveButton("Da", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            writeToACS(readSpeedRef * (-1), speedRefOutAdr);
+
+                            //  writeToACS(controlWordAdr, 5);//TODO: vrijednost za zaustavljanje motora
+
+                        }
+                    });
+
+                    promjenaSmjera.setNegativeButton("Odustani", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+
+                    promjenaSmjera.show();
+                }
+            }
+        });
     }
 
 
@@ -350,11 +436,12 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             @Override
             public void run() {
 
-                SimpleRegister sr;
-                sr = new SimpleRegister(value);
+                SimpleRegister[] sr = new SimpleRegister[2];
+                sr[0] = new SimpleRegister(value);
+                sr[1] = new SimpleRegister(value); //convert to two values
                 Log.d("cele", "reg created");
 
-                WriteSingleRegisterRequest singleRequest = new WriteSingleRegisterRequest(register, sr);
+                WriteMultipleRegistersRequest mulitpleRequest = new WriteMultipleRegistersRequest(register, sr);
 
                 Log.d("cele", "request set");
                 if (!(conn != null && conn.isConnected())) {
@@ -370,7 +457,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     return;
 
                 }
-                trans.setRequest(singleRequest);
+                trans.setRequest(mulitpleRequest);
                 try {
 
                     trans.execute();
@@ -401,11 +488,49 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
             Log.d("cele", "Values refreshed");
 
-            currentActualCurrent.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(54), regResponse.getRegisterValue(55), 100) + " A"); // Scales to current (ACS 880 = 100)
+            readSpeedRef = (int) twoIntsToACSTransparent(regResponse.getRegisterValue(speedRefInAdr), regResponse.getRegisterValue(speedRefInAdr + 1), 1);
 
-            currentActualSpeed.setText(regResponse.getRegisterValue(50) + regResponse.getRegisterValue(51) + regResponse.getRegisterValue(52) + "");
-                   // regResponse.getRegisterValue(55) + "");
 
+            int tempSpeedRef;
+
+            if(readSpeedRef >= 0){
+                tempSpeedRef = readSpeedRef;
+            }else{
+
+                tempSpeedRef = readSpeedRef * (-1);
+            }
+            speedReference.setProgress(tempSpeedRef);
+
+            currentActualCurrent.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(currentInAdr), regResponse.getRegisterValue(currentInAdr + 1), 100) + " A"); // Scales to current (ACS 880 = 100)
+
+            currentActualSpeed.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(speedRefInAdr), regResponse.getRegisterValue(speedRefInAdr + 1), 100) + " 1/min");
+
+            currentActualPower.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(powerInAdr), regResponse.getRegisterValue(powerInAdr + 1), 100) + " kW");
+
+
+
+            isReady = getBitState(1, statusWordAdr);
+            isMotorRunning = getBitState(2, statusWordAdr);
+
+
+            if(isReady){//TODO: Find real bit addresses to use
+
+                if(isMotorRunning){
+
+                    startStop.setText("START");
+                    startStop.setBackgroundColor(Color.RED);
+                }else{
+
+                    startStop.setText("STOP");
+                    startStop.setBackgroundColor(Color.GREEN);
+
+                }
+
+            }else{
+                startStop.setText("Nije spremno");
+                startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
+
+            }
             // TODO: Gui refreshing,
             // TODO: getting bits for READY and start/stop,
             // TODO: getting values to write to ACS
@@ -417,6 +542,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         }
 
     }
+
 
 
     @Override
@@ -435,16 +561,104 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     }
 
 
-    public static int twoIntsToACSTransparent(int reg1, int reg2, int scaleValue) {
+    public static float twoIntsToACSTransparent(int reg1, int reg2, int scaleValue) {
 
-
+        int numberHelper;
 
 
         byte[] b1 = ByteBuffer.allocate(4).putInt(reg1).array();
         byte[] b2 = ByteBuffer.allocate(4).putInt(reg2).array();
 
+
         byte[] b32bit = {b1[2], b1[3], b2[2], b2[3]};
 
-        return ByteBuffer.wrap(b32bit).getInt() / scaleValue;
+
+
+        numberHelper = ByteBuffer.wrap(b32bit).getInt();
+
+
+
+       String helper = Integer.toBinaryString(  numberHelper  );
+
+       return parseUnsignedInt(helper, 2) / scaleValue;
+
+
+
     }
+
+    public void setExactBit(boolean state, int bitOffset, int regAddress){
+
+        String binary = Integer.toBinaryString(regResponse.getRegisterValue(regAddress));
+
+        char[] binaryArray = binary.toCharArray();
+
+        if(state){
+            binaryArray[bitOffset] = '1';
+
+        }else{
+
+            binaryArray[bitOffset] = '0';
+        }
+
+        String editedBinary = binaryArray.toString();
+
+        int temp = Integer.parseInt(editedBinary);
+
+        writeToACS(temp, regAddress + 0);
+
+
+    }
+
+
+    public boolean getBitState(int offset, int regAddress){
+
+        String binary = Integer.toBinaryString(regResponse.getRegisterValue(regAddress));
+
+        char[] binaryArray = binary.toCharArray();
+
+        if(binaryArray[offset] == 0){
+            return false;
+        }else {
+
+            return true;
+        }
+
+
+    }
+
+
+    public static int parseUnsignedInt(String s, int radix)
+            throws NumberFormatException {
+        if (s == null)  {
+            throw new NumberFormatException("null");
+        }
+
+        int len = s.length();
+        if (len > 0) {
+            char firstChar = s.charAt(0);
+            if (firstChar == '-') {
+                throw new
+                        NumberFormatException(String.format("Illegal leading minus sign " +
+                        "on unsigned string %s.", s));
+            } else {
+                if (len <= 5 || // Integer.MAX_VALUE in Character.MAX_RADIX is 6 digits
+                        (radix == 10 && len <= 9) ) { // Integer.MAX_VALUE in base 10 is 10 digits
+                    return Integer.parseInt(s, radix);
+                } else {
+                    long ell = Long.parseLong(s, radix);
+                    if ((ell & 0xffffffff00000000L) == 0) {
+                        return (int) ell;
+                    } else {
+                        throw new
+                                NumberFormatException(String.format("String value %s exceeds " +
+                                "range of unsigned int.", s));
+                    }
+                }
+            }
+        } else {
+            throw new NumberFormatException(" String is wrong");
+        }
+    }
+
+
 }
