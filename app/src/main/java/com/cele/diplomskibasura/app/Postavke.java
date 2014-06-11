@@ -25,32 +25,17 @@ public class Postavke extends Activity {
     EditText acsPort;
     EditText sentronIP;
     EditText sentronPort;
-
-
     EditText acsSpeedEstIn;
     EditText acsPowerIn;
     EditText acsCurrentIn;
 
 
-
-    // User name (make variable public to access from outside)
     public static final String ACS_IP = "acsIP";
-
     public static final String ACS_PORT = "acsPort";
-
-    // Email address (make variable public to access from outside)
     public static final String SENTRON_IP = "acsIP";
-
     public static final String SENTRON_PORT = "sentronPort";
-
-
-
     public static final String ACS_SPEED_EST_READ = "acsSpeedEstRead";
-
-
-
     public static final String ACS_POWER_READ = "acsPower";
-
     public static final String ACS_CURRENT_READ = "acsCurrent";
 
 
@@ -96,30 +81,21 @@ public class Postavke extends Activity {
 
                 SharedPreferences.Editor editor = pref.edit();
 
-
                 editor.putString(ACS_IP, acsIp.getText().toString());
                 editor.putInt(ACS_PORT, Integer.valueOf(acsPort.getText().toString()));
-
                 editor.putString(SENTRON_IP, sentronIP.getText().toString());
                 editor.putInt(SENTRON_PORT, Integer.valueOf(sentronPort.getText().toString()));
-
-
-
                 editor.putInt(ACS_POWER_READ, Integer.valueOf(acsPowerIn.getText().toString()));
-
                 editor.putInt(ACS_CURRENT_READ, Integer.valueOf(acsCurrentIn.getText().toString()));
-
                 editor.putInt(ACS_SPEED_EST_READ, Integer.valueOf(acsSpeedEstIn.getText().toString()));
 
                 editor.commit();
-                Toast.makeText(getBaseContext(), "Saved", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Spremljeno", Toast.LENGTH_SHORT).show();
 
                 Intent i = new Intent(Postavke.this, MainActivity.class);
-                // Closing all the Activities
+
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-
-                // Staring Login Activity
                 startActivity(i);
             }
         });

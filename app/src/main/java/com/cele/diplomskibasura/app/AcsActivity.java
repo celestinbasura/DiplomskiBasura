@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,9 +28,10 @@ import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.cele.diplomskibasura.app.Utils.*;
 
 
 public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
@@ -41,15 +43,17 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     TextView currentActualSpeed;
     TextView currentActualCurrent;
     TextView currentActualPower;
+    TextView currentFaultCode;
+    TextView currentWarningCode;
     SeekBar speedReference;
-
+    ImageButton btnWarning;
+    ImageButton btnFault;
 
 
     boolean isMotorRunning = false;
     boolean isWriting = false;
     boolean isFirstCommNeeded = false;
     boolean isLocalActive = false;
-
 
     boolean isReadyToSwitchOn = false;
     boolean isReadyToRun = false;
@@ -62,9 +66,9 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     boolean isAtSetpoint;
     boolean isRemoteActive;
     boolean isAboveLimit;
+    boolean isExtRunEnabled;
 
-
-    Boolean isConnectedToSlave = false;
+    boolean isConnectedToSlave = false;
     SharedPreferences sharedPreferences;
     TCPMasterConnection conn;
 
@@ -74,7 +78,6 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     volatile ModbusTCPTransaction trans = null; //the transaction
     ReadMultipleRegistersRequest regRequest = null;
     volatile ReadMultipleRegistersResponse regResponse = null;
-
 
     final int controlWordAdr = 0;
     final int statusWordAdr = 50;
@@ -86,7 +89,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     int speedEstInAdr;
     int readSpeedRef = 0;
     float currentSpeed;
-    int starStopWriteValue = 1038;
+    int starStopWriteValue = 1150;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,17 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         currentActualCurrent = (TextView) findViewById(R.id.txt_acs_current_current_value);
         currentActualSpeed = (TextView) findViewById(R.id.txt_acs_speed_current_value);
         currentActualPower = (TextView) findViewById(R.id.txt_acs_current_power_value);
+        currentFaultCode = (TextView) findViewById(R.id.txt_acs_current_fault);
+        currentWarningCode = (TextView) findViewById(R.id.txt_acs_current_warning);
+
+        btnFault = (ImageButton) findViewById(R.id.btn_acs_fault);
+        btnWarning = (ImageButton) findViewById(R.id.btn_acs_warning);
+
+        btnFault.setVisibility(View.INVISIBLE);
+        btnWarning.setVisibility(View.INVISIBLE);
+
+        currentFaultCode.setText(" ");
+        currentWarningCode.setText(" ");
 
         startStop = (Button) findViewById(R.id.btn_acs_start_stop);
         startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
@@ -128,9 +142,9 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                                           final AlertDialog.Builder promjenaBrzine = new AlertDialog.Builder(AcsActivity.this);
 
                                                           promjenaBrzine.setTitle("Promjena brzine");
-                                                          promjenaBrzine.setMessage("Da li ste sigurni da zelite brzinu postaviti na " + temp / 200 + "%");
+                                                          promjenaBrzine.setMessage("Postaviti brzinu na " + temp / 200 + "%");
 
-                                                          promjenaBrzine.setPositiveButton("Da", new DialogInterface.OnClickListener() {
+                                                          promjenaBrzine.setPositiveButton("Potvrda", new DialogInterface.OnClickListener() {
                                                               @Override
                                                               public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -161,7 +175,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                         stopMotor.setTitle(startStop.getText());
                         stopMotor.setMessage("Da li ste sigurni?");
 
-                        stopMotor.setPositiveButton("Da", new DialogInterface.OnClickListener() {
+                        stopMotor.setPositiveButton("Potvrdi", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -185,9 +199,6 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             @Override
             public void onClick(View view) {
 
-
-                Log.d("cele", "Rev pressed");
-
                 if(!isMotorRunning){
                     Toast.makeText(getApplicationContext(), "Motor nije pokrenut", Toast.LENGTH_SHORT).show();
                     return;
@@ -200,7 +211,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
 
-                            writeToACS(acsTransparentToInt((readSpeedRef  * (-1))), speedRefOutAdr);
+                            writeToACS(acsTransparentToInt((readSpeedRef * (-1))), speedRefOutAdr);
 
                         }
                     });
@@ -225,10 +236,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 connectToDevice();
-
-            }
+             }
         }).start();
 
 
@@ -442,41 +451,91 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
     void refreshGUI() {
 
-
         if (regResponse != null) {
 
             //Log.d("cele", "Values refreshed");
             readSpeedRef = oneIntToTransparent(regResponse.getRegisterValue(speedRefInAdr));
-
             int tempSpeedRef;
 
             if (readSpeedRef >= 0) {
                 tempSpeedRef = readSpeedRef;
             } else {
-
                 tempSpeedRef = readSpeedRef * (-1);
             }
+
             speedReference.setProgress(tempSpeedRef);
-            currentActualCurrent.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(currentInAdr), regResponse.getRegisterValue(currentInAdr + 1), 100) + " A"); // Scales to current (ACS 880 = 100)
-            currentSpeedReference.setText(oneIntToTransparent(regResponse.getRegisterValue(speedRefInAdr)) + " ");
-            currentSpeed = twoIntsToACSTransparent(regResponse.getRegisterValue(speedEstInAdr + dataInOffset), regResponse.getRegisterValue(speedEstInAdr + 1 + dataInOffset), 100);
+            currentActualCurrent.setText(
+                    twoIntsToACSTransparent(
+                            regResponse.getRegisterValue(currentInAdr),
+                            regResponse.getRegisterValue(currentInAdr + 1),
+                            100) + " A");
+
+            currentSpeedReference.setText(
+                    oneIntToTransparent(
+                            regResponse.getRegisterValue(speedRefInAdr)) + " ");
+
+            currentSpeed = twoIntsToACSTransparent(
+                    regResponse.getRegisterValue(speedEstInAdr + dataInOffset),
+                    regResponse.getRegisterValue(speedEstInAdr + 1 + dataInOffset), 100);
+
             currentActualSpeed.setText(currentSpeed + " 1/min");
-            currentActualPower.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(powerInAdr), regResponse.getRegisterValue(powerInAdr + 1), 100) + " kW");
 
-            isReadyToSwitchOn = getBitState(0, statusWordAdr); Log.d("cele", " isReadyToSwitch on " + isReadyToSwitchOn);
-            isReadyToRun = getBitState(1, statusWordAdr); Log.d("cele", " isReadyToRun" + isReadyToRun);
-            isReadyRef = getBitState(2, statusWordAdr); Log.d("cele", " isReadyRef " + isReadyRef);
-            isFaulted = getBitState(3, statusWordAdr);Log.d("cele", " isFaulted " + isFaulted);
-            isOffTwoInactive = getBitState(4, statusWordAdr);Log.d("cele", " isOff 2 inactive " + isOffTwoInactive);
-            isOffThreeInactive = getBitState(5, statusWordAdr);Log.d("cele", " iisOff 3 inactive " + isOffThreeInactive);
-            isSwitchOnInhibited = getBitState(6, statusWordAdr);Log.d("cele", " isSwitchOn Inhibited " + isSwitchOnInhibited);
-            isWarningActive = getBitState(7, statusWordAdr);Log.d("cele", " isWarning active " + isWarningActive);
-            isAtSetpoint = getBitState(8, statusWordAdr);Log.d("cele", " isAt setpoint " + isAtSetpoint);
-            isRemoteActive = getBitState(9, statusWordAdr);Log.d("cele", " isRemote active" + isRemoteActive);
-            isAboveLimit = getBitState(10, statusWordAdr);Log.d("cele", " isAbove limit " + isAboveLimit);
-
+            currentActualPower.setText(
+                    twoIntsToACSTransparent(
+                            regResponse.getRegisterValue(powerInAdr),
+                            regResponse.getRegisterValue(powerInAdr + 1),
+                            100) + " kW");
 
             int statusWord = regResponse.getRegisterValue(statusWordAdr);
+
+            isReadyToSwitchOn = getBitState(0, statusWord);
+            Log.d("cele", " isReadyToSwitch on " + isReadyToSwitchOn);
+
+            isReadyToRun = getBitState(1, statusWord);
+            Log.d("cele", " isReadyToRun" + isReadyToRun);
+
+            isReadyRef = getBitState(2, statusWord);
+            Log.d("cele", " isReadyRef " + isReadyRef);
+
+            isFaulted = getBitState(3, statusWord);
+            Log.d("cele", " isFaulted " + isFaulted);
+
+            isOffTwoInactive = getBitState(4, statusWord);
+            Log.d("cele", " isOff 2 inactive " + isOffTwoInactive);
+
+            isOffThreeInactive = getBitState(5, statusWord);
+            Log.d("cele", " iisOff 3 inactive " + isOffThreeInactive);
+
+            isSwitchOnInhibited = getBitState(6, statusWord);
+            Log.d("cele", " isSwitchOn Inhibited " + isSwitchOnInhibited);
+
+            isWarningActive = getBitState(7, statusWord);
+            Log.d("cele", " isWarning active " + isWarningActive);
+
+            isAtSetpoint = getBitState(8, statusWord);
+            Log.d("cele", " isAt setpoint " + isAtSetpoint);
+
+            isRemoteActive = getBitState(9, statusWord);
+            Log.d("cele", " isRemote active" + isRemoteActive);
+
+            isAboveLimit = getBitState(10, statusWord);
+            Log.d("cele", " isAbove limit " + isAboveLimit);
+
+            isExtRunEnabled = getBitState(12, statusWord);
+            Log.d("cele", " Remote run " + isExtRunEnabled);
+
+
+            if(isFaulted){
+                btnFault.setVisibility(View.VISIBLE);
+            }else{
+               btnFault.setVisibility(View.INVISIBLE);
+            }
+
+            if(isWarningActive){
+                btnWarning.setVisibility(View.VISIBLE);
+            }else{
+                btnWarning.setVisibility(View.INVISIBLE);
+            }
 
             switch (statusWord) {
 
@@ -489,7 +548,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     startStop.setText("PRIPREMA");
                     startStop.setBackgroundColor(Color.DKGRAY);
                     startStop.setClickable(true);
-                    starStopWriteValue = 1038;
+                    starStopWriteValue = 1150;
                     break;
 
                 case 695:
@@ -500,7 +559,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     startStop.setText("STOP");
                     startStop.setBackgroundColor(Color.RED);
                     startStop.setClickable(true);
-                    starStopWriteValue = 1038;
+                    starStopWriteValue = 1150;
                     break;
 
                 case 689:
@@ -511,7 +570,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     startStop.setText("START");
                     startStop.setBackgroundColor(Color.GREEN);
                     startStop.setClickable(true);
-                    starStopWriteValue = 1039;
+                    starStopWriteValue = 1151;
                     break;
 
                 case 691:
@@ -521,7 +580,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     isLocalActive = false;
                     startStop.setText("PRIPREMA");
                     startStop.setBackgroundColor(Color.DKGRAY);
-                    starStopWriteValue = 1038;
+                    starStopWriteValue = 1150;
                     break;
 
                 default:
@@ -539,14 +598,12 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             }
 
         } else {
-            startStop.setText("Nije spremno");
+            startStop.setText("GRESKA");
             startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
             Log.d("cele", "reg emtpy");
         }
 
     }
-
-
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -564,135 +621,11 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     }
 
 
-    public static float twoIntsToACSTransparent(int reg1, int reg2, int scaleValue) {
-
-        int numberHelper;
-
-        byte[] b1 = ByteBuffer.allocate(4).putInt(reg1).array();
-        byte[] b2 = ByteBuffer.allocate(4).putInt(reg2).array();
-
-
-        byte[] b32bit = {b2[2], b2[3], b1[2], b1[3]};
-        numberHelper = ByteBuffer.wrap(b32bit).getInt();
-
-        String helper = Integer.toBinaryString(  numberHelper  );
-
-        return (float)parseUnsignedInt(helper, 2) / scaleValue;
 
 
 
-    }
-
-    public static int oneIntToTransparent(int reg){
-
-        byte[] b = ByteBuffer.allocate(4).putInt(reg).array();
-
-        String prefixZero = "0000000000000000";
-        String prefixOne = "1111111111111111";
-
-        int helper = ByteBuffer.wrap(b).getInt();
-
-        String binary = Integer.toBinaryString(helper);
-
-        StringBuilder sb = new StringBuilder();
-
-        int lenghtEmpty = 16 - binary.length();
-
-        for(int i = 0; i < lenghtEmpty; i++){
-            sb.append(0);
-
-        }
-        sb.append(binary);
-
-        String complete = sb.toString();
-
-        if(complete.charAt(0) == '1'){
-
-            return parseUnsignedInt((prefixOne + complete), 2);
-
-        }else{
-
-            return parseUnsignedInt((prefixZero + complete), 2);
-        }
-
-    }
-
-    public int acsTransparentToInt(int trasparent) {
 
 
-        byte[] b = ByteBuffer.allocate(4).putInt(trasparent).array();
-
-        int helper = ByteBuffer.wrap(b).getInt();
-
-        return helper;
-    }
-
-
-    public boolean getBitState(int offset, int regAddress){
-
-       int helper = regResponse.getRegisterValue(regAddress);
-
-        String binary = Integer.toBinaryString(helper);
-
-        StringBuilder sb = new StringBuilder();
-
-        int lenghtEmpty = 16 - binary.length();
-
-        for(int i = 0; i < lenghtEmpty; i++){
-            sb.append(0);
-
-        }
-        sb.append(binary);
-
-        String complete = sb.toString();
-
-        Log.d("cele", "Status word is " + complete);
-
-        char[] binaryArray = complete.toCharArray();
-
-        if(binaryArray[15 - offset] == 0){
-            return false;
-        }else {
-
-            return true;
-        }
-
-
-    }
-
-
-    public static int parseUnsignedInt(String s, int radix)
-            throws NumberFormatException {
-        if (s == null)  {
-            throw new NumberFormatException("null");
-        }
-
-        int len = s.length();
-        if (len > 0) {
-            char firstChar = s.charAt(0);
-            if (firstChar == '-') {
-                throw new
-                        NumberFormatException(String.format("Illegal leading minus sign " +
-                        "on unsigned string %s.", s));
-            } else {
-                if (len <= 5 || // Integer.MAX_VALUE in Character.MAX_RADIX is 6 digits
-                        (radix == 10 && len <= 9) ) { // Integer.MAX_VALUE in base 10 is 10 digits
-                    return Integer.parseInt(s, radix);
-                } else {
-                    long ell = Long.parseLong(s, radix);
-                    if ((ell & 0xffffffff00000000L) == 0) {
-                        return (int) ell;
-                    } else {
-                        throw new
-                                NumberFormatException(String.format("String value %s exceeds " +
-                                "range of unsigned int.", s));
-                    }
-                }
-            }
-        } else {
-            throw new NumberFormatException(" String is wrong");
-        }
-    }
 
 
 }

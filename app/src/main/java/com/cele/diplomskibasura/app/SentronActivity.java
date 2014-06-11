@@ -32,11 +32,11 @@ public class SentronActivity extends Activity {
     TextView valueL1;
     TextView valueL2;
     TextView valueL3;
-    TextView frequency;
     TextView valueI1;
     TextView valueI2;
     TextView valueI3;
     TextView avgVoltage;
+    TextView frequency;
 
 
     Boolean isConnectedToSlave = false;
@@ -59,8 +59,6 @@ public class SentronActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sentron);
         sharedPreferences = getApplicationContext().getSharedPreferences(Constants.MY_PREFS, 0); // 0 - for private mode
-
-
         valueL1 = (TextView) findViewById(R.id.txt_sentron_l1);
         valueL2 = (TextView) findViewById(R.id.txt_sentron_l2);
         valueL3 = (TextView) findViewById(R.id.txt_sentron_l3);
@@ -287,12 +285,6 @@ public class SentronActivity extends Activity {
             trans.setRequest(regRequest);
             e.printStackTrace();
         }
-
-
-        //     for (int i = 0; i < regResponse.getWordCount(); i++) {
-//
-        //          Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
-        //    }
 
 
         handler.post(new Runnable() {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pre-dex-items>
+
+    <item
+        dex="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/build/intermediates/pre-dexed/debug/support-v4-19.1.0-fe930dc68beb1e566675ce71b270d4091c6c249b.jar"
+        jar="/Applications/Android Studio.app/sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
+    <item
+        dex="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/build/intermediates/pre-dexed/debug/classes-c553d270d2044e122fdade07f4f9d90e0824fe05.jar"
+        jar="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
+    <item
+        dex="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/build/intermediates/pre-dexed/debug/j2mod-1.03-5314cb6da638d3556819eba82a6bdb8dda377ac3.jar"
+        jar="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/libs/j2mod-1.03.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="0c6ca5cc05713a44983ea6c37dc8d1c93f4c2a4a"/>
+
+</pre-dex-items>
