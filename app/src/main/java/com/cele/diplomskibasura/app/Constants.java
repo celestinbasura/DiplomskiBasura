@@ -15,7 +15,7 @@ public class Constants {
 
     public static int DEFUALT_ACS_CNTR_WRD_ADR = 0;
     public static int DEFUALT_ACS_STS_WRD_ADR = 0;
-    public static int DEFUALT_ACS_SPEED_REF_READ_ADR = 2;
+    public static int DEFUALT_ACS_SPEED_EST_READ_ADR = 2;
     public static int DEFUALT_ACS_SPEED_REF_WRT_ADR = 2;
 
     public static int DEFUALT_ACS_POWER_READ_ADR = 2;

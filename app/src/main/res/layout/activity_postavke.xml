@@ -141,46 +141,10 @@
             android:layout_marginTop="20sp">
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upravlj"
-                android:textSize="20sp"
-                android:paddingBottom="8dp"
-                android:layout_gravity="center"
-                android:gravity="center"/>
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:inputType="number"
-                android:id="@+id/edt_acs_contr_word_adr"
-                android:layout_marginLeft="10dp"
-                android:text="1"
-                />
             <LinearLayout
                 android:layout_width="55dp"
                 android:layout_height="match_parent"></LinearLayout>
 
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Status "
-                android:paddingBottom="8dp"
-                android:textSize="20sp"
-                android:layout_gravity="center"
-                android:gravity="center"/>
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:textSize="20sp"
-                android:inputType="number"
-                android:layout_marginStart="50dp"
-                android:id="@+id/edt_acs_status_wrd_adr"
-                android:text="1"
-                />
 
 
         </LinearLayout>
@@ -196,7 +160,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ref. brz"
+                android:text="Tren. brzina"
                 android:textSize="20sp"
                 android:paddingBottom="8dp"
                 android:layout_gravity="center"
@@ -206,7 +170,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:inputType="number"
-                android:id="@+id/edt_acs_speedref_set_adr"
+                android:id="@+id/edt_acs_speedcurr_read_adr"
                 android:layout_marginLeft="10dp"
                 android:text="1"
                 />
@@ -215,25 +179,6 @@
                 android:layout_height="match_parent"></LinearLayout>
 
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="ref. brz"
-                android:paddingBottom="8dp"
-                android:textSize="20sp"
-                android:layout_gravity="center"
-                android:gravity="center"/>
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:textSize="20sp"
-                android:inputType="number"
-                android:layout_marginStart="50dp"
-                android:id="@+id/edt_acs_speedref_read_adr"
-                android:text="2"
-                />
-
 
         </LinearLayout>
 
@@ -248,7 +193,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Snaga "
+                android:text="Tren. snaga "
                 android:textSize="20sp"
                 android:paddingBottom="8dp"
                 android:layout_gravity="center"
@@ -281,7 +226,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Struja  "
+                android:text="Tren. struja  "
                 android:textSize="20sp"
                 android:paddingBottom="8dp"
                 android:layout_gravity="center"
