@@ -44,12 +44,24 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     SeekBar speedReference;
 
 
-    boolean isReadyToSwitchOn = false;
-    boolean isReadyToSwitchOperate = false;
+
     boolean isMotorRunning = false;
     boolean isWriting = false;
     boolean isFirstCommNeeded = false;
     boolean isLocalActive = false;
+
+
+    boolean isReadyToSwitchOn = false;
+    boolean isReadyToRun = false;
+    boolean isReadyRef;
+    boolean isFaulted;
+    boolean isOffTwoInactive;
+    boolean isOffThreeInactive;
+    boolean isSwitchOnInhibited;
+    boolean isWarningActive;
+    boolean isAtSetpoint;
+    boolean isRemoteActive;
+    boolean isAboveLimit;
 
 
     Boolean isConnectedToSlave = false;
@@ -74,7 +86,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     int speedEstInAdr;
     int readSpeedRef = 0;
     float currentSpeed;
-    int starStopWriteValue = 1150;
+    int starStopWriteValue = 1038;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -434,9 +446,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         if (regResponse != null) {
 
             //Log.d("cele", "Values refreshed");
-
             readSpeedRef = oneIntToTransparent(regResponse.getRegisterValue(speedRefInAdr));
-
 
             int tempSpeedRef;
 
@@ -447,21 +457,24 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                 tempSpeedRef = readSpeedRef * (-1);
             }
             speedReference.setProgress(tempSpeedRef);
-
             currentActualCurrent.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(currentInAdr), regResponse.getRegisterValue(currentInAdr + 1), 100) + " A"); // Scales to current (ACS 880 = 100)
-
-
             currentSpeedReference.setText(oneIntToTransparent(regResponse.getRegisterValue(speedRefInAdr)) + " ");
             currentSpeed = twoIntsToACSTransparent(regResponse.getRegisterValue(speedEstInAdr + dataInOffset), regResponse.getRegisterValue(speedEstInAdr + 1 + dataInOffset), 100);
             currentActualSpeed.setText(currentSpeed + " 1/min");
-
             currentActualPower.setText(twoIntsToACSTransparent(regResponse.getRegisterValue(powerInAdr), regResponse.getRegisterValue(powerInAdr + 1), 100) + " kW");
 
+            isReadyToSwitchOn = getBitState(0, statusWordAdr); Log.d("cele", " isReadyToSwitch on " + isReadyToSwitchOn);
+            isReadyToRun = getBitState(1, statusWordAdr); Log.d("cele", " isReadyToRun" + isReadyToRun);
+            isReadyRef = getBitState(2, statusWordAdr); Log.d("cele", " isReadyRef " + isReadyRef);
+            isFaulted = getBitState(3, statusWordAdr);Log.d("cele", " isFaulted " + isFaulted);
+            isOffTwoInactive = getBitState(4, statusWordAdr);Log.d("cele", " isOff 2 inactive " + isOffTwoInactive);
+            isOffThreeInactive = getBitState(5, statusWordAdr);Log.d("cele", " iisOff 3 inactive " + isOffThreeInactive);
+            isSwitchOnInhibited = getBitState(6, statusWordAdr);Log.d("cele", " isSwitchOn Inhibited " + isSwitchOnInhibited);
+            isWarningActive = getBitState(7, statusWordAdr);Log.d("cele", " isWarning active " + isWarningActive);
+            isAtSetpoint = getBitState(8, statusWordAdr);Log.d("cele", " isAt setpoint " + isAtSetpoint);
+            isRemoteActive = getBitState(9, statusWordAdr);Log.d("cele", " isRemote active" + isRemoteActive);
+            isAboveLimit = getBitState(10, statusWordAdr);Log.d("cele", " isAbove limit " + isAboveLimit);
 
-
-
-            isReadyToSwitchOn = getBitState(0, statusWordAdr);
-            isReadyToSwitchOperate = getBitState(1, statusWordAdr);
 
             int statusWord = regResponse.getRegisterValue(statusWordAdr);
 
@@ -476,7 +489,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     startStop.setText("PRIPREMA");
                     startStop.setBackgroundColor(Color.DKGRAY);
                     startStop.setClickable(true);
-                    starStopWriteValue = 1550;
+                    starStopWriteValue = 1038;
                     break;
 
                 case 695:
@@ -487,7 +500,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     startStop.setText("STOP");
                     startStop.setBackgroundColor(Color.RED);
                     startStop.setClickable(true);
-                    starStopWriteValue = 1550;
+                    starStopWriteValue = 1038;
                     break;
 
                 case 689:
@@ -498,7 +511,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     startStop.setText("START");
                     startStop.setBackgroundColor(Color.GREEN);
                     startStop.setClickable(true);
-                    starStopWriteValue = 1551;
+                    starStopWriteValue = 1039;
                     break;
 
                 case 691:
@@ -508,12 +521,12 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     isLocalActive = false;
                     startStop.setText("PRIPREMA");
                     startStop.setBackgroundColor(Color.DKGRAY);
-                    starStopWriteValue = 1550;
+                    starStopWriteValue = 1038;
                     break;
 
                 default:
 
-                    if(statusWord < 600) {
+                    if(statusWord < 513) {
                         isLocalActive = true;
                         isMotorRunning = false;
                         isFirstCommNeeded = false;
