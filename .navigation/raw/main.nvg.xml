@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<navigationModel
+  ns = "http://schemas.android.com?import=com.android.navigation.*">
+  <locations  
+    class = "java.util.ArrayList">
+    <entry>
+      <key      
+        class = "com.android.navigation.ActivityState"      
+        className = "com.cele.diplomskibasura.app.Splash">
+        <location        
+          id = "point0"        
+          x = "0"        
+          y = "0"/>
+      </key>
+      <value      
+        x = "500"      
+        y = "100"      
+        class = "com.android.navigation.Point"/>
+    </entry>
+    <entry>
+      <key      
+        class = "com.android.navigation.ActivityState"      
+        className = "com.cele.diplomskibasura.app.Postavke">
+        <location        
+          idref = "point0"/>
+      </key>
+      <value      
+        x = "500"      
+        y = "1480"      
+        class = "com.android.navigation.Point"/>
+    </entry>
+    <entry>
+      <key      
+        class = "com.android.navigation.ActivityState"      
+        className = "com.cele.diplomskibasura.app.AcsActivity">
+        <location        
+          idref = "point0"/>
+      </key>
+      <value      
+        x = "2688"      
+        y = "2529"      
+        class = "com.android.navigation.Point"/>
+    </entry>
+    <entry>
+      <key      
+        class = "com.android.navigation.ActivityState"      
+        className = "com.cele.diplomskibasura.app.SentronActivity">
+        <location        
+          idref = "point0"/>
+      </key>
+      <value      
+        x = "2055"      
+        y = "3636"      
+        class = "com.android.navigation.Point"/>
+    </entry>
+    <entry>
+      <key      
+        class = "com.android.navigation.ActivityState"      
+        className = "com.cele.diplomskibasura.app.MainActivity">
+        <location        
+          idref = "point0"/>
+      </key>
+      <value      
+        x = "0"      
+        y = "4427"      
+        class = "com.android.navigation.Point"/>
+    </entry>
+    <entry>
+      <key      
+        class = "com.android.navigation.MenuState"      
+        xmlResourceName = "main">
+        <location        
+          idref = "point0"/>
+      </key>
+      <value      
+        x = "1760"      
+        y = "5600"      
+        class = "com.android.navigation.Point"/>
+    </entry>
+  </locations>
+</navigationModel>

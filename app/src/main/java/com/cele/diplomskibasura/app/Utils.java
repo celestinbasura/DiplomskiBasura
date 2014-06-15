@@ -100,10 +100,10 @@ public class Utils {
 
         sb.append(binary);
         String complete = sb.toString();
-        Log.d("cele", "Status word is " + complete);
+        //Log.d("cele", "Status word is " + complete);
         char[] binaryArray = complete.toCharArray();
 
-        if (binaryArray[15 - offset] == 0) {
+        if (binaryArray[15 - offset] == '0') {
             return false;
         } else {
             return true;

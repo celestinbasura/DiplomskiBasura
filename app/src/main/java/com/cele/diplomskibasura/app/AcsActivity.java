@@ -487,12 +487,13 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                             100) + " kW");
 
             int statusWord = regResponse.getRegisterValue(statusWordAdr);
+            Log.d("cele", " Status word je " + Integer.toBinaryString(statusWord));
 
             isReadyToSwitchOn = getBitState(0, statusWord);
             Log.d("cele", " isReadyToSwitch on " + isReadyToSwitchOn);
 
             isReadyToRun = getBitState(1, statusWord);
-            Log.d("cele", " isReadyToRun" + isReadyToRun);
+            Log.d("cele", " isReadyToRun " + isReadyToRun);
 
             isReadyRef = getBitState(2, statusWord);
             Log.d("cele", " isReadyRef " + isReadyRef);
@@ -527,75 +528,76 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
             if(isFaulted){
                 btnFault.setVisibility(View.VISIBLE);
+                currentFaultCode.setText("FAULT");
+
             }else{
                btnFault.setVisibility(View.INVISIBLE);
+                currentFaultCode.setText(" ");
             }
 
             if(isWarningActive){
                 btnWarning.setVisibility(View.VISIBLE);
+                currentWarningCode.setText("WARNING");
             }else{
                 btnWarning.setVisibility(View.INVISIBLE);
+                currentWarningCode.setText(" ");
             }
 
-            switch (statusWord) {
+
+            if(isFaulted) {
+
+                btnFault.setVisibility(View.VISIBLE);
+                startStop.setText("FAULT");
+                startStop.setBackgroundColor(Color.RED);
+                startStop.setClickable(false);
+
+            }else{
+
+                btnFault.setVisibility(View.INVISIBLE);
+
+                if(!isRemoteActive){
+
+                    startStop.setText("LOKALNO");
+                    startStop.setBackgroundColor(Color.LTGRAY);
+                    startStop.setClickable(false);
+
+                }else{
 
 
-                case 754:
+                        if((!isReadyToSwitchOn || isSwitchOnInhibited) || (isReadyToRun && !isReadyRef)){
 
-                    isMotorRunning = false;
-                    isFirstCommNeeded = true;
-                    isLocalActive = false;
-                    startStop.setText("PRIPREMA");
-                    startStop.setBackgroundColor(Color.DKGRAY);
-                    startStop.setClickable(true);
-                    starStopWriteValue = 1150;
-                    break;
 
-                case 695:
+                            startStop.setText("PRIPREMA");
+                            startStop.setBackgroundColor(Color.DKGRAY);
+                            startStop.setClickable(true);
+                            starStopWriteValue = 1150;
 
-                    isMotorRunning = true;
-                    isFirstCommNeeded = false;
-                    isLocalActive = false;
-                    startStop.setText("STOP");
-                    startStop.setBackgroundColor(Color.RED);
-                    startStop.setClickable(true);
-                    starStopWriteValue = 1150;
-                    break;
 
-                case 689:
+                        }
 
-                    isMotorRunning = false;
-                    isFirstCommNeeded = false;
-                    isLocalActive = false;
-                    startStop.setText("START");
-                    startStop.setBackgroundColor(Color.GREEN);
-                    startStop.setClickable(true);
-                    starStopWriteValue = 1151;
-                    break;
+                        if(isReadyToSwitchOn && !isReadyToRun && !isReadyRef){
+                            startStop.setText("START");
+                            startStop.setBackgroundColor(Color.GREEN);
+                            startStop.setClickable(true);
+                            starStopWriteValue = 1151;
 
-                case 691:
 
-                    isMotorRunning = false;
-                    isFirstCommNeeded = true;
-                    isLocalActive = false;
-                    startStop.setText("PRIPREMA");
-                    startStop.setBackgroundColor(Color.DKGRAY);
-                    starStopWriteValue = 1150;
-                    break;
+                        }else{
 
-                default:
+                    if(isReadyToSwitchOn && isReadyToRun && isReadyRef){
+                        startStop.setText("STOP");
+                        startStop.setBackgroundColor(Color.RED);
+                        startStop.setClickable(true);
+                        starStopWriteValue = 1150;
 
-                    if(statusWord < 513) {
-                        isLocalActive = true;
-                        isMotorRunning = false;
-                        isFirstCommNeeded = false;
-                        startStop.setText("LOKALNI MOD");
-                        startStop.setBackgroundColor(Color.LTGRAY);
-                        startStop.setClickable(false);
-                        break;
+
                     }
 
-            }
+
+                    }}
+
+
+                }
 
         } else {
             startStop.setText("GRESKA");
