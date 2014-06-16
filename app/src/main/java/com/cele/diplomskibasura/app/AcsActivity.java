@@ -148,7 +148,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                                               @Override
                                                               public void onClick(DialogInterface dialogInterface, int i) {
 
-                                                                  Toast.makeText(getApplicationContext(), "Value is " + temp, Toast.LENGTH_SHORT).show();
+                                                                 // Toast.makeText(getApplicationContext(), "Value is " + temp, Toast.LENGTH_SHORT).show();
 
                                                                   if(currentSpeed < 0){
                                                                       writeToACS(acsTransparentToInt((temp * (-1))), speedRefOutAdr);
@@ -305,7 +305,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     }
                 };
 
-                tm.scheduleAtFixedRate(readRegs, (long) 500, (long) 200);
+                tm.scheduleAtFixedRate(readRegs, (long) 500, (long) 20);
                 isConnectedToSlave = true;
 
             }
@@ -350,6 +350,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             return;
         }
 
+        long time = System.currentTimeMillis();
         regRequest = new ReadMultipleRegistersRequest(0, 75);
 
         trans = new ModbusTCPTransaction(conn);
@@ -402,6 +403,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                 refreshGUI();
             }
         });
+        Log.d("cele", "Read time is " + (System.currentTimeMillis() - time));
 
     }
 
@@ -496,43 +498,43 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                             100) + " kW");
 
             int statusWord = regResponse.getRegisterValue(statusWordAdr);
-            Log.d("cele", " Status word je " + Integer.toBinaryString(statusWord));
+           // Log.d("cele", " Status word je " + Integer.toBinaryString(statusWord));
 
             isReadyToSwitchOn = getBitState(0, statusWord);
-            Log.d("cele", " isReadyToSwitch on " + isReadyToSwitchOn);
+           // Log.d("cele", " isReadyToSwitch on " + isReadyToSwitchOn);
 
             isReadyToRun = getBitState(1, statusWord);
-            Log.d("cele", " isReadyToRun " + isReadyToRun);
+           // Log.d("cele", " isReadyToRun " + isReadyToRun);
 
             isReadyRef = getBitState(2, statusWord);
-            Log.d("cele", " isReadyRef " + isReadyRef);
+           // Log.d("cele", " isReadyRef " + isReadyRef);
 
             isFaulted = getBitState(3, statusWord);
-            Log.d("cele", " isFaulted " + isFaulted);
+           // Log.d("cele", " isFaulted " + isFaulted);
 
             isOffTwoInactive = getBitState(4, statusWord);
-            Log.d("cele", " isOff 2 inactive " + isOffTwoInactive);
+           // Log.d("cele", " isOff 2 inactive " + isOffTwoInactive);
 
             isOffThreeInactive = getBitState(5, statusWord);
-            Log.d("cele", " iisOff 3 inactive " + isOffThreeInactive);
+           // Log.d("cele", " iisOff 3 inactive " + isOffThreeInactive);
 
             isSwitchOnInhibited = getBitState(6, statusWord);
-            Log.d("cele", " isSwitchOn Inhibited " + isSwitchOnInhibited);
+           // Log.d("cele", " isSwitchOn Inhibited " + isSwitchOnInhibited);
 
             isWarningActive = getBitState(7, statusWord);
-            Log.d("cele", " isWarning active " + isWarningActive);
+           // Log.d("cele", " isWarning active " + isWarningActive);
 
             isAtSetpoint = getBitState(8, statusWord);
-            Log.d("cele", " isAt setpoint " + isAtSetpoint);
+           // Log.d("cele", " isAt setpoint " + isAtSetpoint);
 
             isRemoteActive = getBitState(9, statusWord);
-            Log.d("cele", " isRemote active" + isRemoteActive);
+           // Log.d("cele", " isRemote active" + isRemoteActive);
 
             isAboveLimit = getBitState(10, statusWord);
-            Log.d("cele", " isAbove limit " + isAboveLimit);
+           // Log.d("cele", " isAbove limit " + isAboveLimit);
 
             isExtRunEnabled = getBitState(12, statusWord);
-            Log.d("cele", " Remote run " + isExtRunEnabled);
+           // Log.d("cele", " Remote run " + isExtRunEnabled);
 
 
             if(isFaulted){
