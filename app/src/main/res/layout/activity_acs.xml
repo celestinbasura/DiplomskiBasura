@@ -89,7 +89,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.7"
+            android:layout_weight="0.5"
             android:text="Trenutna brzina:"
             android:id="@+id/txt_acs_speed_current_text"
             android:textSize="20sp"/>
@@ -113,7 +113,7 @@
     <TextView
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.7"
+        android:layout_weight="0.5"
         android:text="Trenutna struja:"
         android:id="@+id/txt_acs_current_current_text"
         android:textSize="20sp"/>
@@ -140,7 +140,7 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.7"
+            android:layout_weight="0.5"
             android:text="Trenutna snaga:"
             android:id="@+id/txt_acs_current_power_text"
             android:textSize="20sp"/>

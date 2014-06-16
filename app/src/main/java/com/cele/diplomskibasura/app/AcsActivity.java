@@ -149,7 +149,16 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                                               public void onClick(DialogInterface dialogInterface, int i) {
 
                                                                   Toast.makeText(getApplicationContext(), "Value is " + temp, Toast.LENGTH_SHORT).show();
-                                                                  writeToACS(temp, speedRefOutAdr );
+
+                                                                  if(currentSpeed < 0){
+                                                                      writeToACS(acsTransparentToInt((temp * (-1))), speedRefOutAdr);
+
+                                                                  }else{
+                                                                      writeToACS(temp, speedRefOutAdr );
+
+                                                                  }
+
+                                                                 // writeToACS(temp, speedRefOutAdr );
 
                                                               }
                                                           });
@@ -199,7 +208,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             @Override
             public void onClick(View view) {
 
-                if(!isMotorRunning){
+                if(currentSpeed == 0){
                     Toast.makeText(getApplicationContext(), "Motor nije pokrenut", Toast.LENGTH_SHORT).show();
                     return;
                 }else {
@@ -296,7 +305,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     }
                 };
 
-                tm.scheduleAtFixedRate(readRegs, (long) 500, (long) 500);
+                tm.scheduleAtFixedRate(readRegs, (long) 500, (long) 200);
                 isConnectedToSlave = true;
 
             }
@@ -410,7 +419,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
                 WriteSingleRegisterRequest mulitpleRequest = new WriteSingleRegisterRequest(register, sr);
 
-                Log.d("cele", "request set");
+                Log.d("cele", "request set" + register + " with " + value);
                 if (!(conn != null && conn.isConnected())) {
 
                     handler.post(new Runnable() {
