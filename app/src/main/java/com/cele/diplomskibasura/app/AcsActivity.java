@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -31,7 +32,10 @@ import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.cele.diplomskibasura.app.Utils.*;
+import static com.cele.diplomskibasura.app.Utils.acsTransparentToInt;
+import static com.cele.diplomskibasura.app.Utils.getBitState;
+import static com.cele.diplomskibasura.app.Utils.oneIntToTransparent;
+import static com.cele.diplomskibasura.app.Utils.twoIntsToACSTransparent;
 
 
 public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeListener {
@@ -305,7 +309,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     }
                 };
 
-                tm.scheduleAtFixedRate(readRegs, (long) 500, (long) 20);
+                tm.scheduleAtFixedRate(readRegs, (long) 500, (long) 200);
                 isConnectedToSlave = true;
 
             }
@@ -403,7 +407,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                 refreshGUI();
             }
         });
-        Log.d("cele", "Read time is " + (System.currentTimeMillis() - time));
+      //  Log.d("cele", "Read time is " + (System.currentTimeMillis() - time));
 
     }
 
@@ -464,7 +468,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
         if (regResponse != null) {
 
-            //Log.d("cele", "Values refreshed");
+          //  Log.d("cele", "Values refreshed");
             readSpeedRef = oneIntToTransparent(regResponse.getRegisterValue(speedRefInAdr));
             int tempSpeedRef;
 
@@ -475,11 +479,11 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             }
 
             speedReference.setProgress(tempSpeedRef);
-            currentActualCurrent.setText(
+            currentActualCurrent.setText(String.format("%.2f A"  ,
                     twoIntsToACSTransparent(
                             regResponse.getRegisterValue(currentInAdr),
                             regResponse.getRegisterValue(currentInAdr + 1),
-                            100) + " A");
+                            100)));
 
             currentSpeedReference.setText(
                     oneIntToTransparent(
@@ -489,13 +493,14 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     regResponse.getRegisterValue(speedEstInAdr + dataInOffset),
                     regResponse.getRegisterValue(speedEstInAdr + 1 + dataInOffset), 100);
 
-            currentActualSpeed.setText(currentSpeed + " 1/min");
+            currentActualSpeed.setText(String.format("%.2f 1/min",
+                    currentSpeed));
 
-            currentActualPower.setText(
+            currentActualPower.setText(String.format("%.2f kW",
                     twoIntsToACSTransparent(
                             regResponse.getRegisterValue(powerInAdr),
                             regResponse.getRegisterValue(powerInAdr + 1),
-                            100) + " kW");
+                            100)));
 
             int statusWord = regResponse.getRegisterValue(statusWordAdr);
            // Log.d("cele", " Status word je " + Integer.toBinaryString(statusWord));
@@ -637,8 +642,94 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
 
 
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
 
 
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
+            return true;
+        }
+        else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP){
+            return true;
+        }
+
+        return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
+
+            if(readSpeedRef <= 300 &&  readSpeedRef >= 0){
+
+                writeToACS(0, speedRefOutAdr);
+
+            }
+
+
+
+            if(readSpeedRef >= 0) {
+
+                if (readSpeedRef <= 300 && readSpeedRef >= 0) {
+
+                    writeToACS(0, speedRefOutAdr);
+                    Toast.makeText(getApplicationContext(), "Vec na minimalnoj brzini", Toast.LENGTH_SHORT).show();
+
+                } else {
+
+
+                writeToACS(readSpeedRef - 300, speedRefOutAdr);
+            }
+
+
+
+            }else{
+
+                if (readSpeedRef >= -300 && readSpeedRef <= 0) {
+
+                    writeToACS(0, speedRefOutAdr);
+                    Toast.makeText(getApplicationContext(), "Vec na minimalnoj brzini", Toast.LENGTH_SHORT).show();
+
+                } else
+
+                writeToACS(readSpeedRef + 300, speedRefOutAdr);
+            }
+
+
+            return true;
+        }
+             if(   keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+
+                 if(readSpeedRef >= 0){
+                     if (readSpeedRef >= 19700 && readSpeedRef <= 20000) {
+
+                         writeToACS(20000, speedRefOutAdr);
+                         Toast.makeText(getApplicationContext(), "Vec na maksimalnoj brzini", Toast.LENGTH_SHORT).show();
+                     }else{
+
+                         writeToACS(readSpeedRef + 300, speedRefOutAdr);
+                     }
+
+
+
+                 }else{
+
+                     if (readSpeedRef <= -19700 && readSpeedRef >= -20000) {
+
+                         writeToACS(-20000, speedRefOutAdr);
+                         Toast.makeText(getApplicationContext(), "Vec na maksimalnoj brzini", Toast.LENGTH_SHORT).show();
+
+                     }else{
+                         writeToACS(readSpeedRef - 300, speedRefOutAdr);
+                     }
+
+                 }
+                 return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+
+    }
 
 
 }

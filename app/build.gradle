@@ -22,4 +22,6 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile files('libs/j2mod-1.03.jar')
     compile 'com.android.support:appcompat-v7:19.+'
+    compile files('libs/jamod-1.2-SNAPSHOT-sources.jar')
+    compile files('libs/jamod-1.2-SNAPSHOT.jar')
 }

@@ -6,18 +6,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.ghgande.j2mod.modbus.ModbusException;
-import com.ghgande.j2mod.modbus.ModbusIOException;
-import com.ghgande.j2mod.modbus.ModbusSlaveException;
-import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
-import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
-import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
-import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
-import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersResponse;
-import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
-import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
+import net.wimpi.modbus.ModbusException;
+import net.wimpi.modbus.ModbusIOException;
+import net.wimpi.modbus.ModbusSlaveException;
+import net.wimpi.modbus.io.ModbusTCPTransaction;
+import net.wimpi.modbus.msg.ReadMultipleRegistersRequest;
+import net.wimpi.modbus.msg.ReadMultipleRegistersResponse;
+import net.wimpi.modbus.net.TCPMasterConnection;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -48,10 +44,8 @@ public class SentronActivity extends Activity {
     Handler handler = new Handler();
     volatile ModbusTCPTransaction trans = null; //the transaction
     ReadMultipleRegistersRequest regRequest = null;
-    volatile ReadMultipleRegistersResponse regResponse = null;
+    ReadMultipleRegistersResponse regResponse = null;
 
-
-    Boolean isWriting = false;
 
 
     @Override
@@ -117,7 +111,7 @@ public class SentronActivity extends Activity {
             // conn.setTimeout(1000);
 
             if (!conn.isConnected()) {
-                Log.d("cele", "Connecting...");
+                Log.d("cele", "Connecting..." + conn.getAddress().toString());
                 conn.connect();
 
             } else {
@@ -126,8 +120,9 @@ public class SentronActivity extends Activity {
 
 
             if (conn.isConnected()) {
-                Log.d("cele", "Connected");
+                Log.d("cele", "Connected " + conn.getAddress().toString() );
 
+                conn.setTimeout(5000);
                 tm = new Timer();
                 readRegs = new TimerTask() {
                     @Override
@@ -136,7 +131,7 @@ public class SentronActivity extends Activity {
                     }
                 };
 
-                tm.scheduleAtFixedRate(readRegs, (long) 100, (long) 500);
+                tm.scheduleAtFixedRate(readRegs, (long) 500, (long) 1000);
 
 
                 isConnectedToSlave = true;
@@ -181,81 +176,24 @@ public class SentronActivity extends Activity {
 
     }
 
-
-    void writeToSentronTest() {
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-
-                SimpleRegister[] sr = new SimpleRegister[1];
-                sr[0] = new SimpleRegister((int) (Math.random() * 1000));
-                Log.d("cele", "reg created");
-
-                WriteMultipleRegistersRequest singleRequest = new WriteMultipleRegistersRequest(69, sr);
-                // WriteMultipleRegisterRequest singleRequest = new WriteSingleRegisterRequest(8, sr);
-                // WriteMultipleRegisterResponse singleResponse = null;
-                WriteMultipleRegistersResponse singleResponse = null;
-
-
-                //WriteMultipleRegistersRequest writeRequest = new WriteMultipleRegistersRequest(sr);
-                Log.d("cele", "request set");
-                if (!(conn != null && conn.isConnected())) {
-
-
-                    hanler.post(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            Toast.makeText(getBaseContext(), "Not connected to server", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    return;
-
-
-                }
-                trans.setRequest(singleRequest);
-                try {
-
-                    trans.execute();
-                    trans.getResponse();
-                    Log.d("cele", "executed");
-                } catch (ModbusException e) {
-                    e.printStackTrace();
-                } catch (NullPointerException e) {
-
-                    e.printStackTrace();
-                }
-                isWriting = false;
-                readSentronRegisters();
-
-            }
-
-
-        }
-        ).start();
-
-
-        isWriting = true;
-
-    }
-
     void readSentronRegisters() {
 
-        if (isWriting) {
-            return;
-        }
 
-        regRequest = new ReadMultipleRegistersRequest(1, 75);
+        regRequest = new ReadMultipleRegistersRequest(1, 70);
+
+
+
+        //SIEMENS PAC WTF????
+        regRequest.setUnitID(1);
 
         trans = new ModbusTCPTransaction(conn);
         trans.setRequest(regRequest);
 
         try {
 
+            Log.d("cele", "trans: " + trans.toString());
             trans.execute();
+           // Log.d("cele", trans.getTransactionID() + "");
 
         } catch (ModbusIOException e) {
             Log.d("cele", "IO error");
@@ -275,14 +213,18 @@ public class SentronActivity extends Activity {
         }
 
         try {
-            if (trans.getResponse() instanceof WriteMultipleRegistersResponse) {
 
-                Log.d("cele", " response is write");
-            }
             regResponse = (ReadMultipleRegistersResponse) trans.getResponse();
 
+            if(regResponse == null){
+                Log.d("cele", " response is NULL");
+            }else{
+                Log.d("cele", " response is NOT null");
+
+            }
+
         } catch (ClassCastException e) {
-            trans.setRequest(regRequest);
+            //trans.setRequest(regRequest);
             e.printStackTrace();
         }
 

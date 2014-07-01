@@ -32,7 +32,7 @@ public class Postavke extends Activity {
 
     public static final String ACS_IP = "acsIP";
     public static final String ACS_PORT = "acsPort";
-    public static final String SENTRON_IP = "acsIP";
+    public static final String SENTRON_IP = "sentronIP";
     public static final String SENTRON_PORT = "sentronPort";
     public static final String ACS_SPEED_EST_READ = "acsSpeedEstRead";
     public static final String ACS_POWER_READ = "acsPower";
