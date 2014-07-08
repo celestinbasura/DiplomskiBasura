@@ -54,10 +54,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     ImageButton btnFault;
 
 
-    boolean isMotorRunning = false;
     boolean isWriting = false;
-    boolean isFirstCommNeeded = false;
-    boolean isLocalActive = false;
 
     boolean isReadyToSwitchOn = false;
     boolean isReadyToRun = false;
@@ -83,6 +80,10 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     ReadMultipleRegistersRequest regRequest = null;
     volatile ReadMultipleRegistersResponse regResponse = null;
 
+
+    //Memory offset as defined in ABB manual for FENA 11
+    //communication module
+
     final int controlWordAdr = 0;
     final int statusWordAdr = 50;
     final int speedRefInAdr = 51;
@@ -93,6 +94,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     int speedEstInAdr;
     int readSpeedRef = 0;
     float currentSpeed;
+
+    //default control word value for stopping the motor(required for first startup)
     int starStopWriteValue = 1150;
 
     @Override
@@ -100,6 +103,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acs);
 
+        //getting the sharedPrerefences for IP and PORT address retrieval
         sharedPreferences = getApplicationContext().getSharedPreferences(Constants.MY_PREFS, 0); // 0 - for private mode
 
         currentSpeedReference = (TextView) findViewById(R.id.txt_acs_reference_value);
@@ -141,18 +145,22 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                                       @Override
                                                       public void onStopTrackingTouch(final SeekBar seekBar) {
 
+
+                                                          //Dialog box shows on stopSeek on the seekbar. A temp value is saved
+                                                          //so the value doesnt change during the dialog box
                                                           final int temp = seekBar.getProgress();
 
                                                           final AlertDialog.Builder promjenaBrzine = new AlertDialog.Builder(AcsActivity.this);
 
                                                           promjenaBrzine.setTitle("Promjena brzine");
+
+                                                          //seekbar max is at 20000 so it is needed to divide by 200 to make the percentage from
+                                                          //the max speed
                                                           promjenaBrzine.setMessage("Postaviti brzinu na " + temp / 200 + "%");
 
                                                           promjenaBrzine.setPositiveButton("Potvrda", new DialogInterface.OnClickListener() {
                                                               @Override
                                                               public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                                 // Toast.makeText(getApplicationContext(), "Value is " + temp, Toast.LENGTH_SHORT).show();
 
                                                                   if(currentSpeed < 0){
                                                                       writeToACS(acsTransparentToInt((temp * (-1))), speedRefOutAdr);
@@ -161,8 +169,6 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                                                       writeToACS(temp, speedRefOutAdr );
 
                                                                   }
-
-                                                                 // writeToACS(temp, speedRefOutAdr );
 
                                                               }
                                                           });
@@ -354,7 +360,6 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             return;
         }
 
-        long time = System.currentTimeMillis();
         regRequest = new ReadMultipleRegistersRequest(0, 75);
 
         trans = new ModbusTCPTransaction(conn);
@@ -392,22 +397,13 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
             trans.setRequest(regRequest);
             e.printStackTrace();
         }
-
-            /*    if(regResponse != null) {
-                    for (int i = 50; i < regResponse.getWordCount(); i++) {
-
-                        Log.d("cele", "Value is " + i + " :  " + regResponse.getRegisterValue(i));
-                    }
-                }
-*/
-        handler.post(new Runnable() {
+    handler.post(new Runnable() {
             @Override
             public void run() {
 
                 refreshGUI();
             }
         });
-      //  Log.d("cele", "Read time is " + (System.currentTimeMillis() - time));
 
     }
 
@@ -439,7 +435,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                     return;
 
                 }
-              //  isWriting = true;
+                isWriting = true;
                 trans.setRequest(mulitpleRequest);
                 try {
                     Log.d("cele", "Writing " + sr + " to " + register);

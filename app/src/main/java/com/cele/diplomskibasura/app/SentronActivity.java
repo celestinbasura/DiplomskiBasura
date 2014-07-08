@@ -40,7 +40,6 @@ public class SentronActivity extends Activity {
     TCPMasterConnection conn;
     Timer tm;
     TimerTask readRegs;
-    Handler hanler = new Handler();
     Handler handler = new Handler();
     volatile ModbusTCPTransaction trans = null; //the transaction
     ReadMultipleRegistersRequest regRequest = null;
@@ -108,7 +107,6 @@ public class SentronActivity extends Activity {
             InetAddress address = InetAddress.getByName(sentronIP);
             conn = new TCPMasterConnection(address);
             conn.setPort(sentronPort);
-            // conn.setTimeout(1000);
 
             if (!conn.isConnected()) {
                 Log.d("cele", "Connecting..." + conn.getAddress().toString());
@@ -181,8 +179,6 @@ public class SentronActivity extends Activity {
 
         regRequest = new ReadMultipleRegistersRequest(1, 70);
 
-
-
         //SIEMENS PAC WTF????
         regRequest.setUnitID(1);
 
@@ -193,7 +189,7 @@ public class SentronActivity extends Activity {
 
             Log.d("cele", "trans: " + trans.toString());
             trans.execute();
-           // Log.d("cele", trans.getTransactionID() + "");
+
 
         } catch (ModbusIOException e) {
             Log.d("cele", "IO error");
