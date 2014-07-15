@@ -52,6 +52,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     SeekBar speedReference;
     ImageButton btnWarning;
     ImageButton btnFault;
+    boolean isFirstRefresh = true;
 
 
     boolean isWriting = false;
@@ -123,7 +124,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         currentWarningCode.setText(" ");
 
         startStop = (Button) findViewById(R.id.btn_acs_start_stop);
-        startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
+       // startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
+        startStop.setBackgroundResource(R.drawable.button_selector);
         reverse = (Button) findViewById(R.id.btn_acs_reverziranje);
 
         powerInAdr = sharedPreferences.getInt(Postavke.ACS_POWER_READ, Constants.DEFUALT_ACS_POWER_READ_ADR) + dataInOffset;
@@ -465,16 +467,21 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
         if (regResponse != null) {
 
           //  Log.d("cele", "Values refreshed");
-            readSpeedRef = oneIntToTransparent(regResponse.getRegisterValue(speedRefInAdr));
-            int tempSpeedRef;
 
-            if (readSpeedRef >= 0) {
-                tempSpeedRef = readSpeedRef;
-            } else {
-                tempSpeedRef = readSpeedRef * (-1);
+            if(isFirstRefresh){
+                readSpeedRef = oneIntToTransparent(regResponse.getRegisterValue(speedRefInAdr));
+                int tempSpeedRef;
+
+                if (readSpeedRef >= 0) {
+                    tempSpeedRef = readSpeedRef;
+                } else {
+                    tempSpeedRef = readSpeedRef * (-1);
+                }
+
+                speedReference.setProgress(tempSpeedRef);
+                isFirstRefresh = false;
             }
 
-            speedReference.setProgress(tempSpeedRef);
             currentActualCurrent.setText(String.format("%.2f A"  ,
                     twoIntsToACSTransparent(
                             regResponse.getRegisterValue(currentInAdr),
@@ -560,7 +567,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
                 btnFault.setVisibility(View.VISIBLE);
                 startStop.setText("FAULT");
-                startStop.setBackgroundColor(Color.RED);
+               // startStop.setBackgroundColor(Color.RED);
+                startStop.setBackgroundResource(R.drawable.button_red_selector);
                 startStop.setClickable(false);
 
             }else{
@@ -570,7 +578,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                 if(!isRemoteActive){
 
                     startStop.setText("LOKALNO");
-                    startStop.setBackgroundColor(Color.LTGRAY);
+                   // startStop.setBackgroundColor(Color.LTGRAY);
+                    startStop.setBackgroundResource(R.drawable.button_selector);
                     startStop.setClickable(false);
 
                 }else{
@@ -580,7 +589,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
 
                             startStop.setText("PRIPREMA");
-                            startStop.setBackgroundColor(Color.DKGRAY);
+                           // startStop.setBackgroundColor(Color.DKGRAY);
+                            startStop.setBackgroundResource(R.drawable.button_selector);
                             startStop.setClickable(true);
                             starStopWriteValue = 1150;
 
@@ -589,7 +599,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
                         if(isReadyToSwitchOn && !isReadyToRun && !isReadyRef){
                             startStop.setText("START");
-                            startStop.setBackgroundColor(Color.GREEN);
+                           // startStop.setBackgroundColor(Color.GREEN);
+                            startStop.setBackgroundResource(R.drawable.button_green_sel);
                             startStop.setClickable(true);
                             starStopWriteValue = 1151;
 
@@ -598,7 +609,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
                     if(isReadyToSwitchOn && isReadyToRun && isReadyRef){
                         startStop.setText("STOP");
-                        startStop.setBackgroundColor(Color.RED);
+                        //startStop.setBackgroundColor(Color.RED);
+                        startStop.setBackgroundResource(R.drawable.button_red_selector);
                         startStop.setClickable(true);
                         starStopWriteValue = 1150;
 
@@ -613,7 +625,8 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
 
         } else {
             startStop.setText("GRESKA");
-            startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
+           // startStop.setBackgroundColor(Color.parseColor("#ff2280d7"));
+            startStop.setBackgroundResource(R.drawable.button_selector);
             Log.d("cele", "reg emtpy");
         }
 
