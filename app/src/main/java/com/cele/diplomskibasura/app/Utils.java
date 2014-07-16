@@ -46,8 +46,7 @@ public class Utils {
     public static int acsTransparentToInt(int trasparent) {
 
         byte[] b = ByteBuffer.allocate(4).putInt(trasparent).array();
-        int helper = ByteBuffer.wrap(b).getInt();
-        return helper;
+        return ByteBuffer.wrap(b).getInt();
     }
 
 
@@ -103,11 +102,7 @@ public class Utils {
         //Log.d("cele", "Status word is " + complete);
         char[] binaryArray = complete.toCharArray();
 
-        if (binaryArray[15 - offset] == '0') {
-            return false;
-        } else {
-            return true;
-        }
+        return binaryArray[15 - offset] != '0';
     }
 
 }
