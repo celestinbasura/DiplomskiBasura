@@ -164,6 +164,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                                                               @Override
                                                               public void onClick(DialogInterface dialogInterface, int i) {
 
+                                                                  currentSpeedReference.setText( temp / 200 + "%");
                                                                   if(currentSpeed < 0){
                                                                       writeToACS(acsTransparentToInt((temp * (-1))), speedRefOutAdr);
 
@@ -488,9 +489,9 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
                             regResponse.getRegisterValue(currentInAdr + 1),
                             100)));
 
-            currentSpeedReference.setText(
-                    oneIntToTransparent(
-                            regResponse.getRegisterValue(speedRefInAdr)) + " ");
+          //  currentSpeedReference.setText(
+          //          oneIntToTransparent(
+          //                  regResponse.getRegisterValue(speedRefInAdr)) + " ");
 
             currentSpeed = twoIntsToACSTransparent(
                     regResponse.getRegisterValue(speedEstInAdr + dataInOffset),
@@ -648,97 +649,7 @@ public class AcsActivity extends Activity implements SeekBar.OnSeekBarChangeList
     }
 
 
-
-
-
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-
-
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
-            return true;
-        }
-        else if(keyCode == KeyEvent.KEYCODE_VOLUME_UP){
-            return true;
-        }
-
-        return super.onKeyUp(keyCode, event);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN){
-
-            if(readSpeedRef <= 300 &&  readSpeedRef >= 0){
-
-                writeToACS(0, speedRefOutAdr);
-
-            }
-
-
-
-            if(readSpeedRef >= 0) {
-
-                if (readSpeedRef <= 300 && readSpeedRef >= 0) {
-
-                    writeToACS(0, speedRefOutAdr);
-                    Toast.makeText(getApplicationContext(), "Vec na minimalnoj brzini", Toast.LENGTH_SHORT).show();
-
-                } else {
-
-
-                writeToACS(readSpeedRef - 300, speedRefOutAdr);
-            }
-
-
-
-            }else{
-
-                if (readSpeedRef >= -300 && readSpeedRef <= 0) {
-
-                    writeToACS(0, speedRefOutAdr);
-                    Toast.makeText(getApplicationContext(), "Vec na minimalnoj brzini", Toast.LENGTH_SHORT).show();
-
-                } else
-
-                writeToACS(readSpeedRef + 300, speedRefOutAdr);
-            }
-
-
-            return true;
-        }
-             if(   keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-
-                 if(readSpeedRef >= 0){
-                     if (readSpeedRef >= 19700 && readSpeedRef <= 20000) {
-
-                         writeToACS(20000, speedRefOutAdr);
-                         Toast.makeText(getApplicationContext(), "Vec na maksimalnoj brzini", Toast.LENGTH_SHORT).show();
-                     }else{
-
-                         writeToACS(readSpeedRef + 300, speedRefOutAdr);
-                     }
-
-
-
-                 }else{
-
-                     if (readSpeedRef <= -19700 && readSpeedRef >= -20000) {
-
-                         writeToACS(-20000, speedRefOutAdr);
-                         Toast.makeText(getApplicationContext(), "Vec na maksimalnoj brzini", Toast.LENGTH_SHORT).show();
-
-                     }else{
-                         writeToACS(readSpeedRef - 300, speedRefOutAdr);
-                     }
-
-                 }
-                 return true;
-        }
-
-        return super.onKeyDown(keyCode, event);
-
     }
 
 
-}
+
