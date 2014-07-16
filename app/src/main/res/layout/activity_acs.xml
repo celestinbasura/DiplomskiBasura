@@ -19,9 +19,11 @@
 <Button
     android:layout_width="match_parent"
     android:layout_height="70dp"
-    android:background="#ff2280d7"
+    android:background="@drawable/list_background"
     android:textColor="#ffcff1ff"
     android:id="@+id/btn_acs_start_stop"
+    android:textSize="25sp"
+    android:textStyle="bold"
     android:text="Nije spremno"/>
 
 
@@ -71,7 +73,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="#ff2280d7"
+        android:background="@drawable/button_selector"
         android:textColor="#ffcff1ff"
         android:id="@+id/btn_acs_reverziranje"
         android:text="Promjena smjera"

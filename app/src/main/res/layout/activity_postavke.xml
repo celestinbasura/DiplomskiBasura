@@ -328,7 +328,7 @@
         android:layout_weight="0.15"
         android:id="@+id/btn_save_settings"
         android:text="Spremi"
-        android:background="#ff2280d7"
+        android:background="@drawable/button_selector"
         android:textColor="#ffcff1ff"
         android:textSize="30sp"/>
 </LinearLayout>
