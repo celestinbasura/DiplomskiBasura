@@ -2,26 +2,26 @@
 <pre-dex-items>
 
     <item
-        dex="C:\Users\Celestin\AndroidProjects\DiplomskiBasura\app\build\intermediates\pre-dexed\debug\j2mod-1.03-4827506da465a9553ad011c4531cf9ee78b4a162.jar"
-        jar="C:\Users\Celestin\AndroidProjects\DiplomskiBasura\app\libs\j2mod-1.03.jar"
+        dex="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/build/intermediates/pre-dexed/debug/j2mod-1.03-5314cb6da638d3556819eba82a6bdb8dda377ac3.jar"
+        jar="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/libs/j2mod-1.03.jar"
         jumboMode="false"
         revision="19.1.0"
         sha1="0c6ca5cc05713a44983ea6c37dc8d1c93f4c2a4a"/>
     <item
-        dex="C:\Users\Celestin\AndroidProjects\DiplomskiBasura\app\build\intermediates\pre-dexed\debug\classes-906d7bb9e85fa98733bd67eb5699d8f932444d34.jar"
-        jar="C:\Users\Celestin\AndroidProjects\DiplomskiBasura\build\intermediates\exploded-aar\com.android.support\appcompat-v7\19.0.1\classes.jar"
+        dex="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/build/intermediates/pre-dexed/debug/support-v4-19.1.0-c399bdc2942bf87a839dff6bde7bb000637b3879.jar"
+        jar="/Applications/Android Studio copy.app/sdk/extras/android/m2repository/com/android/support/support-v4/19.1.0/support-v4-19.1.0.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="f71a6822470c9eb659d4f4a6cb57b780b35f058b"/>
+        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67"/>
     <item
-        dex="C:\Users\Celestin\AndroidProjects\DiplomskiBasura\app\build\intermediates\pre-dexed\debug\support-v4-19.0.1-4e4071bea63b2621c3a485509e42501de639b2c9.jar"
-        jar="C:\Program Files (x86)\Android\android-studio1\sdk\extras\android\m2repository\com\android\support\support-v4\19.0.1\support-v4-19.0.1.jar"
+        dex="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/build/intermediates/pre-dexed/debug/classes-c553d270d2044e122fdade07f4f9d90e0824fe05.jar"
+        jar="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/build/intermediates/exploded-aar/com.android.support/appcompat-v7/19.1.0/classes.jar"
         jumboMode="false"
         revision="19.1.0"
-        sha1="587da9a481ffd341d2fa091704489b89845ddacd"/>
+        sha1="3499ceba05ca1f6037c6a2fad73df8f636224a28"/>
     <item
-        dex="C:\Users\Celestin\AndroidProjects\DiplomskiBasura\app\build\intermediates\pre-dexed\debug\jamod-1.2-SNAPSHOT-2b1f888ec10a1539ac0a508264df4457d0ca43cc.jar"
-        jar="C:\Users\Celestin\AndroidProjects\DiplomskiBasura\app\libs\jamod-1.2-SNAPSHOT.jar"
+        dex="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/build/intermediates/pre-dexed/debug/jamod-1.2-SNAPSHOT-5635bbaa0383d03e46d6929cf4125e058325f54a.jar"
+        jar="/Users/celestinbasura/Documents/Android projects/DiplomskiBasura/app/libs/jamod-1.2-SNAPSHOT.jar"
         jumboMode="false"
         revision="19.1.0"
         sha1="fb543826072663fb91a508d07b63fb4bd1e034f2"/>
