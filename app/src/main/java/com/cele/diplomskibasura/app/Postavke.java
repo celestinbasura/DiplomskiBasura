@@ -82,6 +82,8 @@ public class Postavke extends Activity {
                 editor.putInt(ACS_CURRENT_READ, Integer.valueOf(acsCurrentIn.getText().toString()));
                 editor.putInt(ACS_SPEED_EST_READ, Integer.valueOf(acsSpeedEstIn.getText().toString()));
 
+
+
                 editor.commit();
                 Toast.makeText(getBaseContext(), "Spremljeno", Toast.LENGTH_SHORT).show();
 

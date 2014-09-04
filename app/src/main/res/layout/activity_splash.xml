@@ -19,8 +19,8 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.4"
-        android:layout_margin="10dp"
+        android:layout_weight="0.32"
+        android:layout_margin="5dp"
         android:src="@drawable/tvz_logo"/>
 
 
@@ -28,11 +28,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.15"
+        android:layout_weight="0.19"
         android:padding="5dp"
         android:textColor="#ff000000"
-        android:text="Upravljanje postrojenjem pomocu Android aplikacije"
-        android:textSize="23sp"
+        android:text="Izrada Android aplikacije za nadzor i upravljanje jednostavnih sustava automatizacije"
+        android:textSize="25sp"
         android:gravity="center"/>
 
 
